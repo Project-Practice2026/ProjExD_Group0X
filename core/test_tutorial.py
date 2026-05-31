@@ -1,6 +1,8 @@
-"""Tutorial startup settings tests.
+"""チュートリアルの自動表示判定と設定永続化のテスト。
 
-Run with:
+描画には依存せず、初回起動判定・表示済みフラグ保存・異常系フォールバックのみを検証する。
+
+実行方法:
     python -m pytest core/test_tutorial.py
 """
 
