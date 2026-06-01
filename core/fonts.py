@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-from functools import cache
 from pathlib import Path
 
 import pygame as pg
@@ -20,7 +19,12 @@ FONT_DIR = Path(__file__).parent.parent / "assets" / "font"
 FONT_DEFAULT = FONT_DIR / "NotoSansJP-Regular.ttf"
 
 
-@cache
 def get_font(size: int, path: Path = FONT_DEFAULT) -> pg.font.Font:
-    """指定サイズのフォントを返す（同サイズはキャッシュ）。"""
+    """指定サイズのフォントを返す。
+
+    pg.quit() でフォントサブシステムが解放されると、過去に生成した Font
+    オブジェクトは内部リソースが無効化される。プロセス全体でキャッシュすると
+    再 init 後に無効な Font を返し use-after-free（CI では exit 139）を招くため、
+    毎回新規生成する。
+    """
     return pg.font.Font(str(path), size)
