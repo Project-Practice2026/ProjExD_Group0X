@@ -199,7 +199,7 @@ class TutorialOverlay:
         hint_rect = hint.get_rect(
             bottomleft=(
                 panel_rect.x + self.PANEL_PADDING,
-                panel_rect.bottom -15,
+                panel_rect.bottom - 15,
             )
         )
         screen.blit(hint, hint_rect)
