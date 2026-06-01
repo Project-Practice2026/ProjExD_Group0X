@@ -313,7 +313,7 @@ class VersusGame:
         if not pg.font.get_init():
             pg.font.init()
         font = get_font(48)
-        text = font.render(f"WINNER: {self._winner.upper()}", True, COLOR_TEXT)
+        text = font.render(f"勝者: {self._winner.upper()}", True, COLOR_TEXT)
         rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
         bg_rect = rect.inflate(40, 24)
         pg.draw.rect(screen, (0, 0, 0), bg_rect)
