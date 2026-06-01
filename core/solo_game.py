@@ -104,6 +104,7 @@ class SoloGame(Game):
     TUTORIAL_HINT_TEXT: str = "[P] チュートリアルを表示"
     TUTORIAL_HINT_FONT_SIZE: int = 20
     TUTORIAL_HINT_MARGIN_BOTTOM: int = 12
+    TUTORIAL_HINT_MARGIN_RIGHT: int = 12
 
     def __init__(  # noqa: PLR0913 - solo モードは合成層なので注入引数が増えやすい
         self,
@@ -268,10 +269,13 @@ class SoloGame(Game):
             self._tutorial_overlay.draw(self._screen)
 
     def _draw_tutorial_hint(self) -> None:
-        """画面下部中央に「P でチュートリアルを表示」のヒントを描画する。"""
+        """画面右下に「P でチュートリアルを表示」のヒントを描画する。"""
         surface = self._hint_font.render(self.TUTORIAL_HINT_TEXT, True, COLOR_TEXT)
         rect = surface.get_rect(
-            midbottom=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - self.TUTORIAL_HINT_MARGIN_BOTTOM)
+            bottomright=(
+                SCREEN_WIDTH - self.TUTORIAL_HINT_MARGIN_RIGHT,
+                SCREEN_HEIGHT - self.TUTORIAL_HINT_MARGIN_BOTTOM,
+            )
         )
         self._screen.blit(surface, rect)
 
