@@ -52,9 +52,9 @@ class TutorialOverlay:
         """フォントと表示状態を初期化する。"""
         if not pg.font.get_init():
             pg.font.init()
-        self._title_font: pg.font.Font = get_font(None, self.TITLE_FONT_SIZE)
-        self._section_font: pg.font.Font = get_font(None, self.SECTION_FONT_SIZE)
-        self._body_font: pg.font.Font = get_font(None, self.BODY_FONT_SIZE)
+        self._title_font: pg.font.Font = get_font(self.TITLE_FONT_SIZE)
+        self._section_font: pg.font.Font = get_font(self.SECTION_FONT_SIZE)
+        self._body_font: pg.font.Font = get_font(self.BODY_FONT_SIZE)
         self._visible: bool = True
         self._skip_next_time: bool = False
         self._close_rect: pg.Rect = pg.Rect(
@@ -198,7 +198,7 @@ class TutorialOverlay:
         hint_rect = hint.get_rect(
             bottomleft=(
                 panel_rect.x + self.PANEL_PADDING,
-                panel_rect.bottom - self.PANEL_PADDING,
+                panel_rect.bottom -15,
             )
         )
         screen.blit(hint, hint_rect)
