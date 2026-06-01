@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="480" viewBox="0 0 760 480">
+
+    <style>
+      svg { background: #ffffff; font-family: Arial, Helvetica, sans-serif; }
+      .title { fill: #1f2937; font-size: 24px; font-weight: 700; text-anchor: middle; }
+      .subtitle { fill: #6b7280; font-size: 12px; text-anchor: middle; }
+      .panel-title { fill: #1f2937; font-size: 14px; font-weight: 700; text-anchor: middle; }
+      .axis-label { fill: #6b7280; font-size: 11px; text-anchor: middle; }
+      .axis-title { fill: #1f2937; font-size: 13px; font-weight: 700; text-anchor: middle; }
+      .note { fill: #1f2937; font-size: 13px; text-anchor: middle; }
+      .legend { fill: #1f2937; font-size: 12px; dominant-baseline: middle; }
+    </style>
+    
+<text x="50%" y="38" class="title">Final best_fitness heatmap (gen 12)</text><text x="50%" y="62" class="subtitle">source: evolution_tuning_20260601_213357.csv</text>
+<text x="380.0" y="94" class="axis-title">mutation_rate</text>
+<text x="54" y="216" class="axis-title" transform="rotate(-90 54 216)">tournament_size</text>
+<text x="380.0" y="420" class="note">best: mutation=0.2, tournament=3, best_fitness=245.055</text>
+<text x="237.0" y="100.0" class="axis-label">0.01</text>
+<text x="355.0" y="100.0" class="axis-label">0.05</text>
+<text x="473.0" y="100.0" class="axis-label">0.1</text>
+<text x="591.0" y="100.0" class="axis-label">0.2</text>
+<text x="154.0" y="155.0" class="axis-label" text-anchor="end">2</text>
+<text x="154.0" y="221.0" class="axis-label" text-anchor="end">3</text>
+<text x="154.0" y="287.0" class="axis-label" text-anchor="end">5</text>
+<rect x="178.0" y="118.0" width="118.0" height="66.0" fill="#eff6ff" stroke="#ffffff" stroke-width="2" /><text x="237.0" y="156.0" fill="#1f2937" font-size="15" font-weight="700" text-anchor="middle">177</text>
+<rect x="296.0" y="118.0" width="118.0" height="66.0" fill="#eff6ff" stroke="#ffffff" stroke-width="2" /><text x="355.0" y="156.0" fill="#1f2937" font-size="15" font-weight="700" text-anchor="middle">184</text>
+<rect x="414.0" y="118.0" width="118.0" height="66.0" fill="#60a5fa" stroke="#ffffff" stroke-width="2" /><text x="473.0" y="156.0" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">215.5</text>
+<rect x="532.0" y="118.0" width="118.0" height="66.0" fill="#2563eb" stroke="#ffffff" stroke-width="2" /><text x="591.0" y="156.0" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">239.1</text>
+<rect x="178.0" y="184.0" width="118.0" height="66.0" fill="#eff6ff" stroke="#ffffff" stroke-width="2" /><text x="237.0" y="222.0" fill="#1f2937" font-size="15" font-weight="700" text-anchor="middle">182.5</text>
+<rect x="296.0" y="184.0" width="118.0" height="66.0" fill="#bfdbfe" stroke="#ffffff" stroke-width="2" /><text x="355.0" y="222.0" fill="#1f2937" font-size="15" font-weight="700" text-anchor="middle">201.5</text>
+<rect x="414.0" y="184.0" width="118.0" height="66.0" fill="#2563eb" stroke="#ffffff" stroke-width="2" /><text x="473.0" y="222.0" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">231.9</text>
+<rect x="532.0" y="184.0" width="118.0" height="66.0" fill="#1e3a8a" stroke="#ffffff" stroke-width="2" /><text x="591.0" y="222.0" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">245.1</text>
+<rect x="178.0" y="250.0" width="118.0" height="66.0" fill="#bfdbfe" stroke="#ffffff" stroke-width="2" /><text x="237.0" y="288.0" fill="#1f2937" font-size="15" font-weight="700" text-anchor="middle">196</text>
+<rect x="296.0" y="250.0" width="118.0" height="66.0" fill="#60a5fa" stroke="#ffffff" stroke-width="2" /><text x="355.0" y="288.0" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">214.7</text>
+<rect x="414.0" y="250.0" width="118.0" height="66.0" fill="#2563eb" stroke="#ffffff" stroke-width="2" /><text x="473.0" y="288.0" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">233.5</text>
+<rect x="532.0" y="250.0" width="118.0" height="66.0" fill="#2563eb" stroke="#ffffff" stroke-width="2" /><text x="591.0" y="288.0" fill="#ffffff" font-size="15" font-weight="700" text-anchor="middle">243.2</text>
+</svg>

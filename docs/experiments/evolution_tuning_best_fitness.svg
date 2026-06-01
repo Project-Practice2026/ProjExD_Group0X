@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="620" viewBox="0 0 1080 620">
+
+    <style>
+      svg { background: #ffffff; font-family: Arial, Helvetica, sans-serif; }
+      .title { fill: #1f2937; font-size: 24px; font-weight: 700; text-anchor: middle; }
+      .subtitle { fill: #6b7280; font-size: 12px; text-anchor: middle; }
+      .panel-title { fill: #1f2937; font-size: 14px; font-weight: 700; text-anchor: middle; }
+      .axis-label { fill: #6b7280; font-size: 11px; text-anchor: middle; }
+      .axis-title { fill: #1f2937; font-size: 13px; font-weight: 700; text-anchor: middle; }
+      .note { fill: #1f2937; font-size: 13px; text-anchor: middle; }
+      .legend { fill: #1f2937; font-size: 12px; dominant-baseline: middle; }
+    </style>
+    
+<text x="50%" y="38" class="title">Parameter Grid: best_fitness by generation</text><text x="50%" y="62" class="subtitle">source: evolution_tuning_20260601_213357.csv</text>
+<text x="26.0" y="330.0" class="axis-title" transform="rotate(-90 26.0 330.0)">best_fitness</text>
+<text x="540.0" y="528.0" class="axis-title">generation</text>
+<text x="225.3" y="77.0" class="panel-title">tournament_size=2</text>
+<line x1="78.0" y1="500.0" x2="372.7" y2="500.0" stroke="#9ca3af" stroke-width="1.2" />
+<line x1="78.0" y1="95.0" x2="78.0" y2="500.0" stroke="#9ca3af" stroke-width="1.2" />
+<line x1="78.0" y1="95.0" x2="78.0" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="78.0" y="520.0" class="axis-label">0</text>
+<line x1="151.7" y1="95.0" x2="151.7" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="151.7" y="520.0" class="axis-label">3</text>
+<line x1="225.3" y1="95.0" x2="225.3" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="225.3" y="520.0" class="axis-label">6</text>
+<line x1="299.0" y1="95.0" x2="299.0" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="299.0" y="520.0" class="axis-label">9</text>
+<line x1="372.7" y1="95.0" x2="372.7" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="372.7" y="520.0" class="axis-label">12</text>
+<line x1="78.0" y1="500.0" x2="372.7" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="68.0" y="504.0" class="axis-label" text-anchor="end">169</text>
+<line x1="78.0" y1="398.7" x2="372.7" y2="398.7" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="68.0" y="402.7" class="axis-label" text-anchor="end">189.4</text>
+<line x1="78.0" y1="297.5" x2="372.7" y2="297.5" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="68.0" y="301.5" class="axis-label" text-anchor="end">209.9</text>
+<line x1="78.0" y1="196.3" x2="372.7" y2="196.3" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="68.0" y="200.3" class="axis-label" text-anchor="end">230.3</text>
+<line x1="78.0" y1="95.0" x2="372.7" y2="95.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="68.0" y="99.0" class="axis-label" text-anchor="end">250.7</text>
+<polyline fill="none" stroke="#2563eb" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="78.0,472.1 102.6,472.1 127.1,472.1 151.7,472.1 176.2,472.1 200.8,472.1 225.3,472.1 249.9,472.1 274.4,461.6 299.0,461.6 323.6,461.6 348.1,461.6 372.7,460.3" />
+<circle cx="372.7" cy="460.3" r="3.2" fill="#2563eb" />
+<polyline fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="78.0,472.1 102.6,472.1 127.1,472.1 151.7,472.1 176.2,460.4 200.8,460.4 225.3,460.4 249.9,452.7 274.4,452.7 299.0,452.7 323.6,425.7 348.1,425.7 372.7,425.7" />
+<circle cx="372.7" cy="425.7" r="3.2" fill="#dc2626" />
+<polyline fill="none" stroke="#16a34a" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="78.0,472.1 102.6,472.1 127.1,448.2 151.7,448.2 176.2,402.7 200.8,402.7 225.3,358.0 249.9,358.0 274.4,317.9 299.0,317.9 323.6,307.9 348.1,307.6 372.7,269.3" />
+<circle cx="372.7" cy="269.3" r="3.2" fill="#16a34a" />
+<polyline fill="none" stroke="#7c3aed" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="78.0,472.1 102.6,472.1 127.1,451.4 151.7,451.4 176.2,399.7 200.8,399.7 225.3,398.3 249.9,373.9 274.4,297.7 299.0,273.1 323.6,235.7 348.1,152.4 372.7,152.4" />
+<circle cx="372.7" cy="152.4" r="3.2" fill="#7c3aed" />
+<text x="558.0" y="77.0" class="panel-title">tournament_size=3</text>
+<line x1="410.7" y1="500.0" x2="705.3" y2="500.0" stroke="#9ca3af" stroke-width="1.2" />
+<line x1="410.7" y1="95.0" x2="410.7" y2="500.0" stroke="#9ca3af" stroke-width="1.2" />
+<line x1="410.7" y1="95.0" x2="410.7" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="410.7" y="520.0" class="axis-label">0</text>
+<line x1="484.3" y1="95.0" x2="484.3" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="484.3" y="520.0" class="axis-label">3</text>
+<line x1="558.0" y1="95.0" x2="558.0" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="558.0" y="520.0" class="axis-label">6</text>
+<line x1="631.7" y1="95.0" x2="631.7" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="631.7" y="520.0" class="axis-label">9</text>
+<line x1="705.3" y1="95.0" x2="705.3" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="705.3" y="520.0" class="axis-label">12</text>
+<line x1="410.7" y1="500.0" x2="705.3" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<line x1="410.7" y1="398.7" x2="705.3" y2="398.7" stroke="#e5e7eb" stroke-width="0.8" />
+<line x1="410.7" y1="297.5" x2="705.3" y2="297.5" stroke="#e5e7eb" stroke-width="0.8" />
+<line x1="410.7" y1="196.3" x2="705.3" y2="196.3" stroke="#e5e7eb" stroke-width="0.8" />
+<line x1="410.7" y1="95.0" x2="705.3" y2="95.0" stroke="#e5e7eb" stroke-width="0.8" />
+<polyline fill="none" stroke="#2563eb" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="410.7,472.1 435.2,472.1 459.8,472.1 484.3,472.1 508.9,467.2 533.4,466.9 558.0,466.9 582.6,463.1 607.1,461.1 631.7,459.1 656.2,446.3 680.8,446.3 705.3,433.2" />
+<circle cx="705.3" cy="433.2" r="3.2" fill="#2563eb" />
+<polyline fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="410.7,472.1 435.2,472.1 459.8,472.1 484.3,472.1 508.9,466.7 533.4,466.7 558.0,440.3 582.6,440.3 607.1,398.3 631.7,390.7 656.2,381.7 680.8,379.8 705.3,339.1" />
+<circle cx="705.3" cy="339.1" r="3.2" fill="#dc2626" />
+<polyline fill="none" stroke="#16a34a" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="410.7,472.1 435.2,472.1 459.8,472.0 484.3,445.4 508.9,440.5 533.4,285.2 558.0,273.7 582.6,273.7 607.1,257.0 631.7,223.3 656.2,209.8 680.8,188.4 705.3,188.4" />
+<circle cx="705.3" cy="188.4" r="3.2" fill="#16a34a" />
+<polyline fill="none" stroke="#7c3aed" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="410.7,472.1 435.2,472.1 459.8,466.5 484.3,421.1 508.9,377.5 533.4,302.0 558.0,241.0 582.6,194.0 607.1,150.4 631.7,150.4 656.2,122.9 680.8,122.9 705.3,122.9" />
+<circle cx="705.3" cy="122.9" r="3.2" fill="#7c3aed" />
+<text x="890.7" y="77.0" class="panel-title">tournament_size=5</text>
+<line x1="743.3" y1="500.0" x2="1038.0" y2="500.0" stroke="#9ca3af" stroke-width="1.2" />
+<line x1="743.3" y1="95.0" x2="743.3" y2="500.0" stroke="#9ca3af" stroke-width="1.2" />
+<line x1="743.3" y1="95.0" x2="743.3" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="743.3" y="520.0" class="axis-label">0</text>
+<line x1="817.0" y1="95.0" x2="817.0" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="817.0" y="520.0" class="axis-label">3</text>
+<line x1="890.7" y1="95.0" x2="890.7" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="890.7" y="520.0" class="axis-label">6</text>
+<line x1="964.3" y1="95.0" x2="964.3" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="964.3" y="520.0" class="axis-label">9</text>
+<line x1="1038.0" y1="95.0" x2="1038.0" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="1038.0" y="520.0" class="axis-label">12</text>
+<line x1="743.3" y1="500.0" x2="1038.0" y2="500.0" stroke="#e5e7eb" stroke-width="0.8" />
+<line x1="743.3" y1="398.7" x2="1038.0" y2="398.7" stroke="#e5e7eb" stroke-width="0.8" />
+<line x1="743.3" y1="297.5" x2="1038.0" y2="297.5" stroke="#e5e7eb" stroke-width="0.8" />
+<line x1="743.3" y1="196.3" x2="1038.0" y2="196.3" stroke="#e5e7eb" stroke-width="0.8" />
+<line x1="743.3" y1="95.0" x2="1038.0" y2="95.0" stroke="#e5e7eb" stroke-width="0.8" />
+<polyline fill="none" stroke="#2563eb" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="743.3,472.1 767.9,472.1 792.4,472.1 817.0,471.2 841.6,455.4 866.1,453.9 890.7,430.1 915.2,429.3 939.8,424.0 964.3,423.3 988.9,385.4 1013.4,367.6 1038.0,366.4" />
+<circle cx="1038.0" cy="366.4" r="3.2" fill="#2563eb" />
+<polyline fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="743.3,472.1 767.9,472.1 792.4,460.3 817.0,451.4 841.6,424.8 866.1,416.4 890.7,372.3 915.2,372.3 939.8,339.5 964.3,322.6 988.9,289.8 1013.4,276.4 1038.0,273.3" />
+<circle cx="1038.0" cy="273.3" r="3.2" fill="#dc2626" />
+<polyline fill="none" stroke="#16a34a" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="743.3,472.1 767.9,472.1 792.4,454.6 817.0,397.2 841.6,373.5 866.1,365.3 890.7,357.7 915.2,347.0 939.8,260.2 964.3,243.8 988.9,236.1 1013.4,227.2 1038.0,180.2" />
+<circle cx="1038.0" cy="180.2" r="3.2" fill="#16a34a" />
+<polyline fill="none" stroke="#7c3aed" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="743.3,472.1 767.9,472.1 792.4,450.7 817.0,401.2 841.6,375.5 866.1,336.3 890.7,334.5 915.2,229.5 939.8,218.8 964.3,190.3 988.9,177.5 1013.4,134.8 1038.0,132.3" />
+<circle cx="1038.0" cy="132.3" r="3.2" fill="#7c3aed" />
+<line x1="250.0" y1="570.0" x2="274.0" y2="570.0" stroke="#2563eb" stroke-width="2.4" />
+<text x="282.0" y="570.0" class="legend">mutation=0.01</text>
+<line x1="408.0" y1="570.0" x2="432.0" y2="570.0" stroke="#dc2626" stroke-width="2.4" />
+<text x="440.0" y="570.0" class="legend">mutation=0.05</text>
+<line x1="566.0" y1="570.0" x2="590.0" y2="570.0" stroke="#16a34a" stroke-width="2.4" />
+<text x="598.0" y="570.0" class="legend">mutation=0.1</text>
+<line x1="716.0" y1="570.0" x2="740.0" y2="570.0" stroke="#7c3aed" stroke-width="2.4" />
+<text x="748.0" y="570.0" class="legend">mutation=0.2</text>
+</svg>

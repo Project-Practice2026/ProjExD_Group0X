@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="520" viewBox="0 0 980 520">
+
+    <style>
+      svg { background: #ffffff; font-family: Arial, Helvetica, sans-serif; }
+      .title { fill: #1f2937; font-size: 24px; font-weight: 700; text-anchor: middle; }
+      .subtitle { fill: #6b7280; font-size: 12px; text-anchor: middle; }
+      .panel-title { fill: #1f2937; font-size: 14px; font-weight: 700; text-anchor: middle; }
+      .axis-label { fill: #6b7280; font-size: 11px; text-anchor: middle; }
+      .axis-title { fill: #1f2937; font-size: 13px; font-weight: 700; text-anchor: middle; }
+      .note { fill: #1f2937; font-size: 13px; text-anchor: middle; }
+      .legend { fill: #1f2937; font-size: 12px; dominant-baseline: middle; }
+    </style>
+    
+<text x="50%" y="38" class="title">Fitness Weight Sweep</text><text x="50%" y="62" class="subtitle">source: evolution_weight_sweep_20260601_213357.csv</text>
+<text x="26.0" y="285.0" class="axis-title" transform="rotate(-90 26.0 285.0)">fitness</text>
+<text x="490.0" y="430.0" class="axis-title">generation</text>
+<text x="283.5" y="77.0" class="panel-title">best_fitness</text>
+<line x1="78.0" y1="400.0" x2="489.0" y2="400.0" stroke="#9ca3af" stroke-width="1.2" />
+<line x1="78.0" y1="95.0" x2="78.0" y2="400.0" stroke="#9ca3af" stroke-width="1.2" />
+<line x1="78.0" y1="95.0" x2="78.0" y2="400.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="78.0" y="420.0" class="axis-label">0</text>
+<line x1="180.8" y1="95.0" x2="180.8" y2="400.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="180.8" y="420.0" class="axis-label">3</text>
+<line x1="283.5" y1="95.0" x2="283.5" y2="400.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="283.5" y="420.0" class="axis-label">6</text>
+<line x1="386.2" y1="95.0" x2="386.2" y2="400.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="386.2" y="420.0" class="axis-label">9</text>
+<line x1="489.0" y1="95.0" x2="489.0" y2="400.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="489.0" y="420.0" class="axis-label">12</text>
+<line x1="78.0" y1="400.0" x2="489.0" y2="400.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="68.0" y="404.0" class="axis-label" text-anchor="end">117.3</text>
+<line x1="78.0" y1="323.8" x2="489.0" y2="323.8" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="68.0" y="327.8" class="axis-label" text-anchor="end">141.4</text>
+<line x1="78.0" y1="247.5" x2="489.0" y2="247.5" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="68.0" y="251.5" class="axis-label" text-anchor="end">165.4</text>
+<line x1="78.0" y1="171.3" x2="489.0" y2="171.3" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="68.0" y="175.3" class="axis-label" text-anchor="end">189.5</text>
+<line x1="78.0" y1="95.0" x2="489.0" y2="95.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="68.0" y="99.0" class="axis-label" text-anchor="end">213.6</text>
+<polyline fill="none" stroke="#2563eb" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="78.0,218.3 112.2,218.3 146.5,218.3 180.8,218.3 215.0,214.9 249.2,214.9 283.5,198.1 317.8,198.1 352.0,171.2 386.2,166.3 420.5,160.6 454.8,159.4 489.0,133.4" />
+<circle cx="489.0" cy="133.4" r="3.2" fill="#2563eb" />
+<polyline fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="78.0,165.2 112.2,165.2 146.5,165.2 180.8,165.2 215.0,163.1 249.2,163.1 283.5,151.9 317.8,148.8 352.0,143.4 386.2,126.8 420.5,126.8 454.8,116.0 489.0,116.0" />
+<circle cx="489.0" cy="116.0" r="3.2" fill="#dc2626" />
+<text x="732.5" y="77.0" class="panel-title">avg_fitness</text>
+<line x1="527.0" y1="400.0" x2="938.0" y2="400.0" stroke="#9ca3af" stroke-width="1.2" />
+<line x1="527.0" y1="95.0" x2="527.0" y2="400.0" stroke="#9ca3af" stroke-width="1.2" />
+<line x1="527.0" y1="95.0" x2="527.0" y2="400.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="527.0" y="420.0" class="axis-label">0</text>
+<line x1="629.8" y1="95.0" x2="629.8" y2="400.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="629.8" y="420.0" class="axis-label">3</text>
+<line x1="732.5" y1="95.0" x2="732.5" y2="400.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="732.5" y="420.0" class="axis-label">6</text>
+<line x1="835.2" y1="95.0" x2="835.2" y2="400.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="835.2" y="420.0" class="axis-label">9</text>
+<line x1="938.0" y1="95.0" x2="938.0" y2="400.0" stroke="#e5e7eb" stroke-width="0.8" />
+<text x="938.0" y="420.0" class="axis-label">12</text>
+<line x1="527.0" y1="400.0" x2="938.0" y2="400.0" stroke="#e5e7eb" stroke-width="0.8" />
+<line x1="527.0" y1="323.8" x2="938.0" y2="323.8" stroke="#e5e7eb" stroke-width="0.8" />
+<line x1="527.0" y1="247.5" x2="938.0" y2="247.5" stroke="#e5e7eb" stroke-width="0.8" />
+<line x1="527.0" y1="171.3" x2="938.0" y2="171.3" stroke="#e5e7eb" stroke-width="0.8" />
+<line x1="527.0" y1="95.0" x2="938.0" y2="95.0" stroke="#e5e7eb" stroke-width="0.8" />
+<polyline fill="none" stroke="#2563eb" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="527.0,379.0 561.2,299.7 595.5,263.4 629.8,272.4 664.0,251.3 698.2,237.6 732.5,255.1 766.8,219.0 801.0,206.4 835.2,197.6 869.5,180.4 903.8,177.3 938.0,166.1" />
+<circle cx="938.0" cy="166.1" r="3.2" fill="#2563eb" />
+<polyline fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="527.0,349.3 561.2,262.1 595.5,222.8 629.8,237.4 664.0,197.9 698.2,184.2 732.5,173.6 766.8,170.4 801.0,165.8 835.2,157.7 869.5,154.5 903.8,138.7 938.0,128.5" />
+<circle cx="938.0" cy="128.5" r="3.2" fill="#dc2626" />
+<line x1="345.0" y1="470.0" x2="369.0" y2="470.0" stroke="#2563eb" stroke-width="2.4" />
+<text x="377.0" y="470.0" class="legend">baseline</text>
+<line x1="463.0" y1="470.0" x2="487.0" y2="470.0" stroke="#dc2626" stroke-width="2.4" />
+<text x="495.0" y="470.0" class="legend">distance_focus</text>
+</svg>
