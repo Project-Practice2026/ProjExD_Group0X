@@ -65,6 +65,7 @@ class IceTower(BaseTower):
     """氷タワー（速度低下）。"""
 
     element: ClassVar[str] = "ice"
+    image_name: ClassVar[str] = "tower_ice.png"
 
     def __init__(
         self,

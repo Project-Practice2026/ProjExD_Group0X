@@ -116,6 +116,7 @@ class FireTower(BaseTower):
     """火炎タワー（範囲ダメージ）。"""
 
     element: ClassVar[str] = "fire"
+    image_name: ClassVar[str] = "tower_fire.png"
 
     def __init__(
         self,

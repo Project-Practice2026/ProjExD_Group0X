@@ -102,6 +102,7 @@ class LightningTower(BaseTower):
     """雷タワー（チェイン攻撃）。"""
 
     element: ClassVar[str] = "lightning"
+    image_name: ClassVar[str] = "tower_lightning.png"
 
     def __init__(
         self,
