@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from itertools import pairwise
+
 import numpy as np
 
 from core.base_tower import BaseTower
@@ -20,6 +22,7 @@ from core.constants import (
 )
 from core.fortress import Fortress
 from core.world import World
+from evolution import tune_parameters
 from evolution.evolution_driver import EvolutionDriver
 from evolution.evolution_manager import EvolutionManager
 from evolution.evolved_enemy import EvolvedEnemy
@@ -46,6 +49,20 @@ class _FixedBrain:
     def forward(self, input_vec: np.ndarray) -> np.ndarray:
         self.last_input = np.asarray(input_vec, dtype=float)
         return self._output
+
+
+DETERMINISTIC_EVAL_INPUT: np.ndarray = np.linspace(-1.0, 1.0, DEFAULT_INPUT_SIZE)
+
+
+def _weights_match(left: list[np.ndarray], right: list[np.ndarray]) -> bool:
+    """Return whether two NeuralNet weight lists are exactly identical."""
+    return all(np.array_equal(a, b) for a, b in zip(left, right, strict=True))
+
+
+def _deterministic_network_fitness(net: NeuralNet) -> float:
+    """Score a network deterministically from a fixed observation vector."""
+    output = net.forward(DETERMINISTIC_EVAL_INPUT)
+    return float(output[0])
 
 
 def test_neural_net_forward_shape() -> None:
@@ -350,6 +367,29 @@ def test_mutate_rate_zero_keeps_weights_unchanged() -> None:
     )
 
 
+def test_mutation_rate_zero_keeps_population_identical() -> None:
+    """mutation_rate=0.0 keeps an identical-weight population unchanged after breeding."""
+    random_state = np.random.get_state()
+    try:
+        np.random.seed(7)
+        manager = EvolutionManager(population_size=4, mutation_rate=0.0)
+        template_weights = [
+            np.full_like(weights, fill_value=float(index + 1))
+            for index, weights in enumerate(manager.population[0].get_weights())
+        ]
+        for net in manager.population:
+            net.set_weights(template_weights)
+
+        before = [net.get_weights() for net in manager.population]
+        manager.next_generation([1.0, 0.5, 0.3, 0.1])
+        after = [net.get_weights() for net in manager.population]
+    finally:
+        np.random.set_state(random_state)
+
+    assert len(after) == len(before)
+    assert all(_weights_match(weights, template_weights) for weights in after)
+
+
 def test_mutate_rate_one_changes_weights() -> None:
     manager = EvolutionManager(population_size=1)
     net = NeuralNet()
@@ -384,6 +424,21 @@ def test_calc_fitness_uses_enemy_record_values() -> None:
     assert manager.calc_fitness(enemy_record) == expected
 
 
+def test_fitness_monotonicity() -> None:
+    """Fitness increases when damage, survival, or distance progress increases."""
+    manager = EvolutionManager(population_size=1)
+    baseline = {
+        "damage_dealt": 1.0,
+        "survival_time": 1.0,
+        "distance_improvement": 1.0,
+    }
+    base_fitness = manager.calc_fitness(baseline)
+
+    assert manager.calc_fitness({**baseline, "damage_dealt": 2.0}) > base_fitness
+    assert manager.calc_fitness({**baseline, "survival_time": 2.0}) > base_fitness
+    assert manager.calc_fitness({**baseline, "distance_improvement": 2.0}) > base_fitness
+
+
 def test_select_elites_returns_highest_fitness_individuals() -> None:
     manager = EvolutionManager(population_size=1)
     population = [NeuralNet() for _ in range(4)]
@@ -406,6 +461,18 @@ def test_select_elites_uses_default_elite_rate() -> None:
     assert elites[0] is population[-1]
 
 
+def test_elite_always_preserved() -> None:
+    """The first selected elite is always the unique maximum-fitness individual."""
+    manager = EvolutionManager(population_size=1)
+    population = [NeuralNet() for _ in range(5)]
+    top_index = 2
+    fitness_list = [0.0, 1.0, 9.0, 3.0, 2.0]
+
+    elites = manager.select_elites(population, fitness_list, n_elite=1)
+
+    assert elites[0] is population[top_index]
+
+
 def test_tournament_select_returns_best_candidate() -> None:
     manager = EvolutionManager(population_size=1)
     population = [NeuralNet() for _ in range(EVOLUTION_TOURNAMENT_SIZE)]
@@ -418,6 +485,68 @@ def test_tournament_select_returns_best_candidate() -> None:
     )
 
     assert selected is population[1]
+
+
+def test_evolution_improves_average_fitness_with_fixed_seed() -> None:
+    """A fixed-seed deterministic fitness run improves average fitness over generations."""
+    random_state = np.random.get_state()
+    try:
+        np.random.seed(42)
+        manager = EvolutionManager(population_size=12, mutation_rate=EVOLUTION_MUTATION_RATE)
+        averages: list[float] = []
+        bests: list[float] = []
+
+        for _generation in range(8):
+            fitness = [_deterministic_network_fitness(net) for net in manager.population]
+            averages.append(float(np.mean(fitness)))
+            bests.append(max(fitness))
+            manager.next_generation(fitness)
+
+        final_fitness = [_deterministic_network_fitness(net) for net in manager.population]
+        averages.append(float(np.mean(final_fitness)))
+        bests.append(max(final_fitness))
+    finally:
+        np.random.set_state(random_state)
+
+    assert averages[-1] > averages[0]
+    assert all(next_best >= best - 1e-12 for best, next_best in pairwise(bests))
+
+
+def test_parameter_grid_reuses_initial_seed_for_each_combination() -> None:
+    """Parameter grid starts every combination from the same initial population."""
+    random_state = np.random.get_state()
+    original_mutation_rates = tune_parameters.EVOLUTION_TUNING_MUTATION_RATES
+    original_tournament_sizes = tune_parameters.EVOLUTION_TUNING_TOURNAMENT_SIZES
+    original_population_size = tune_parameters.EVOLUTION_TUNING_POPULATION_SIZE
+    original_generation_count = tune_parameters.EVOLUTION_TUNING_GENERATION_COUNT
+    mutation_rates = (0.01, 0.20)
+    tournament_sizes = (2, 5)
+
+    try:
+        tune_parameters.EVOLUTION_TUNING_MUTATION_RATES = mutation_rates
+        tune_parameters.EVOLUTION_TUNING_TOURNAMENT_SIZES = tournament_sizes
+        tune_parameters.EVOLUTION_TUNING_POPULATION_SIZE = 6
+        tune_parameters.EVOLUTION_TUNING_GENERATION_COUNT = 0
+        weights = tune_parameters.FitnessWeights(
+            name="test",
+            damage=1.0,
+            survival=1.0,
+            distance=1.0,
+        )
+
+        rows = tune_parameters.run_parameter_grid(weights)
+    finally:
+        tune_parameters.EVOLUTION_TUNING_MUTATION_RATES = original_mutation_rates
+        tune_parameters.EVOLUTION_TUNING_TOURNAMENT_SIZES = original_tournament_sizes
+        tune_parameters.EVOLUTION_TUNING_POPULATION_SIZE = original_population_size
+        tune_parameters.EVOLUTION_TUNING_GENERATION_COUNT = original_generation_count
+        np.random.set_state(random_state)
+
+    generation_zero_rows = [row for row in rows if row.gen == 0]
+    assert len(generation_zero_rows) == len(mutation_rates) * len(tournament_sizes)
+    first_row = generation_zero_rows[0]
+    assert all(row.best_fitness == first_row.best_fitness for row in generation_zero_rows)
+    assert all(row.avg_fitness == first_row.avg_fitness for row in generation_zero_rows)
 
 
 def test_evolution_driver_waits_until_population_is_evaluated() -> None:
