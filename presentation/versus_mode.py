@@ -15,6 +15,8 @@ from dataclasses import dataclass
 import pygame as pg
 
 try:
+    from core.fonts import get_font
+
     from ..core.base_enemy import BaseEnemy
     from ..core.constants import (
         COLOR_BG,
@@ -33,6 +35,7 @@ try:
     from ..core.fortress import Fortress
     from ..core.wave_manager import EnemyFactory, WaveManager
     from ..core.world import SoundSink, World
+
 except ImportError:
     from core.base_enemy import BaseEnemy
     from core.constants import (
@@ -309,7 +312,7 @@ class VersusGame:
     def _draw_result(self, screen: pg.Surface) -> None:
         if not pg.font.get_init():
             pg.font.init()
-        font = pg.font.SysFont(None, 48)
+        font = get_font(48)
         text = font.render(f"WINNER: {self._winner.upper()}", True, COLOR_TEXT)
         rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
         bg_rect = rect.inflate(40, 24)

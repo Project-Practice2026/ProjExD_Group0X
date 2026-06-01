@@ -37,6 +37,9 @@ except ImportError:
     )
 
 
+from core.fonts import get_font
+
+
 @dataclass(frozen=True)
 class GenerationRecord:
     """1 世代分の適応度記録。"""
@@ -61,7 +64,7 @@ class EvolutionGraph:
         self._height: int = max(20, int(height))
         if not pg.font.get_init():
             pg.font.init()
-        self._font: pg.font.Font = pg.font.SysFont(None, 14)
+        self._font: pg.font.Font = get_font(14)
 
     # ----- accessors -----
 

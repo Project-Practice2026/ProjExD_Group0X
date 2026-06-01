@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import pygame as pg
 
+from core.fonts import get_font
+
 try:
     from ..core.base_player import BasePlayer
     from ..core.constants import COLOR_TEXT
@@ -27,7 +29,7 @@ class WeaponSelectorUI:
     def __init__(self) -> None:
         if not pg.font.get_init():
             pg.font.init()
-        self._font: pg.font.Font = pg.font.SysFont(None, 16)
+        self._font: pg.font.Font = get_font(16)
 
     def draw(
         self,

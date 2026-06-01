@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import pygame as pg
 
+from core.fonts import get_font
+
 from .constants import (
     COLOR_HP_BAR_BG,
     COLOR_HP_BAR_FG,
@@ -30,7 +32,7 @@ class BaseHud:
         # フォントが未初期化なら初期化（pg.init 済みなら no-op）
         if not pg.font.get_init():
             pg.font.init()
-        self._font: pg.font.Font = pg.font.SysFont(None, self.FONT_SIZE)
+        self._font: pg.font.Font = get_font(self.FONT_SIZE)
         self._max_hp: int = FORTRESS_MAX_HP
 
     def set_max_hp(self, value: int) -> None:

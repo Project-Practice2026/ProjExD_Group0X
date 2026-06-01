@@ -31,6 +31,8 @@ except ImportError:
         SCREEN_WIDTH,
     )
 
+from core.fonts import get_font
+
 
 class ExtendedHud(BaseHud):
     """詳細表示版 HUD。"""
@@ -47,7 +49,7 @@ class ExtendedHud(BaseHud):
         super().__init__()
         if not pg.font.get_init():
             pg.font.init()
-        self._panel_font: pg.font.Font = pg.font.SysFont(None, 16)
+        self._panel_font: pg.font.Font = get_font(16)
 
     # 既存 API（後方互換）
     def set_status(self, wave: int, money: int) -> None:

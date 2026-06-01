@@ -40,6 +40,10 @@ jobs:
         run: python -m compileall .
 
       - name: Run simple test files
+        env:
+          # ヘッドレス実行用。アプリ本体ではなく CI 側で headless を指定する。
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
         run: |
           python - <<'PY'
           from pathlib import Path

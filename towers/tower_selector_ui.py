@@ -21,6 +21,7 @@ from core.constants import (
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
 )
+from core.fonts import get_font
 from core.world import World
 
 
@@ -50,7 +51,7 @@ class TowerSelectorUI:
     def __init__(self) -> None:
         if not pg.font.get_init():
             pg.font.init()
-        self._font: pg.font.Font = pg.font.SysFont(None, 18)
+        self._font: pg.font.Font = get_font(18)
 
     def draw(
         self,
