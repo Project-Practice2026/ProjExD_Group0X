@@ -159,7 +159,7 @@ class ClientGame(Game):
         self._screen.fill(COLOR_BG)
         if state is None:
             # Game.run() が draw() 後に flip するため、早期 return でも表示される。
-            self._blit_centered("Waiting for host...", y_offset=CLIENT_WAITING_TEXT_Y_OFFSET)
+            self._blit_centered("ホストからの応答を待ってます...", y_offset=CLIENT_WAITING_TEXT_Y_OFFSET)
             return
         self._draw_fortress(state)
         self._draw_towers(state)
@@ -270,7 +270,7 @@ class ClientGame(Game):
         wave = int(state.get("wave", 0))
         pid = self._client.get_player_id()
         self._blit_text(
-            f"Core HP {hp}  Wave {wave}  Player {pid}",
+            f"拠点HP {hp}  ウェーブ{wave}  プレイヤー {pid}",
             (
                 bar_x + CLIENT_HP_BAR_WIDTH + CLIENT_OVERLAY_TEXT_X_GAP,
                 bar_y + CLIENT_OVERLAY_TEXT_Y_OFFSET,
@@ -281,11 +281,11 @@ class ClientGame(Game):
         """接続失敗時の短い案内を描く。"""
         self._screen.fill(COLOR_BG)
         self._blit_centered(
-            "Failed to connect to host.",
+            "ホストへの接続に失敗しました",
             y_offset=CLIENT_CONNECTION_FAILED_TITLE_Y_OFFSET,
         )
         self._blit_centered(
-            "Press window close to exit.",
+            "ウィンドウを閉じて終了してください。",
             y_offset=CLIENT_CONNECTION_FAILED_HINT_Y_OFFSET,
         )
 
