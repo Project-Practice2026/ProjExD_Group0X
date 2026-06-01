@@ -38,6 +38,7 @@ class Fighter(BasePlayer):
     DASH_MULTIPLIER: float = 1.8
     REPAIR_RANGE: float = 40.0
     DEFAULT_RADIUS: int = 14
+    image_name: ClassVar[str] = "player_fighter.png"
 
     MOVE_KEYS: ClassVar[dict[int, tuple[int, int]]] = {
         pg.K_w: (0, -1),
@@ -231,8 +232,8 @@ class Fighter(BasePlayer):
 
     def draw(self, screen: pg.Surface) -> None:
         """Surface に描画する。"""
+        super().draw(screen)
         x, y = int(self._pos[0]), int(self._pos[1])
-        pg.draw.circle(screen, COLOR_PLAYER, (x, y), self.DEFAULT_RADIUS)
         # 向き表示（短い線）
         fx, fy = self._facing
         end = (int(x + fx * self.DEFAULT_RADIUS), int(y + fy * self.DEFAULT_RADIUS))
