@@ -3,7 +3,7 @@
 描画には依存せず、初回起動判定・表示済みフラグ保存・異常系フォールバックのみを検証する。
 
 実行方法:
-    python -m pytest core/test_tutorial.py
+    python -m core.test_tutorial
 """
 
 from __future__ import annotations
@@ -47,3 +47,10 @@ def test_broken_settings_falls_back_to_first_launch(tmp_path: Path | None = None
         settings_path.write_text("{broken", encoding="utf-8")
 
         assert _should_show_tutorial(get_tutorial_seen(settings_path))
+
+
+if __name__ == "__main__":
+    test_missing_settings_shows_tutorial()
+    test_seen_tutorial_is_not_shown_automatically()
+    test_broken_settings_falls_back_to_first_launch()
+    print("All tests passed.")
