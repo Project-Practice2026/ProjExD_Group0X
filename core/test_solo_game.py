@@ -184,6 +184,45 @@ def test_tutorial_seen_false_saved_when_skip_unchecked() -> None:
     assert not overlay.is_visible()
 
 
+def test_tutorial_hint_drawn_when_overlay_hidden() -> None:
+    """オーバーレイ非表示中は画面下部のチュートリアルヒントを描画する。"""
+    pg.init()
+    pg.display.set_mode((400, 200))
+    overlay = _FakeTutorialOverlay(skip_next_time=False, visible=False)
+    game = SoloGame(max_wave=BOSS_WAVE_MODULO, tutorial_overlay=overlay)
+
+    calls: list[int] = []
+    game._draw_tutorial_hint = lambda: calls.append(1)  # type: ignore[method-assign]
+    game.draw()
+
+    assert calls == [1]
+
+
+def test_tutorial_hint_hidden_when_overlay_visible() -> None:
+    """オーバーレイ表示中はヒントを重複表示しない。"""
+    pg.init()
+    pg.display.set_mode((400, 200))
+    overlay = _FakeTutorialOverlay(skip_next_time=False, visible=True)
+    game = SoloGame(max_wave=BOSS_WAVE_MODULO, tutorial_overlay=overlay)
+
+    calls: list[int] = []
+    game._draw_tutorial_hint = lambda: calls.append(1)  # type: ignore[method-assign]
+    game.draw()
+
+    assert calls == []
+
+
+def test_tutorial_hint_renders_without_error() -> None:
+    """ヒント描画が例外なく Surface へ blit できる。"""
+    pg.init()
+    pg.display.set_mode((400, 200))
+    game = SoloGame(max_wave=BOSS_WAVE_MODULO)
+
+    # 例外が出ないこと、ヒント文言が空でないことを確認する
+    assert game.TUTORIAL_HINT_TEXT
+    game._draw_tutorial_hint()
+
+
 def test_tutorial_seen_saver_none_allows_legacy_overlay() -> None:
     """保存コールバックが無い場合は旧形式オーバーレイでも閉じられる。"""
     pg.init()
@@ -204,5 +243,8 @@ if __name__ == "__main__":
     test_tutorial_overlay_opens_with_pause_key()
     test_tutorial_seen_saved_when_skip_checked()
     test_tutorial_seen_false_saved_when_skip_unchecked()
+    test_tutorial_hint_drawn_when_overlay_hidden()
+    test_tutorial_hint_hidden_when_overlay_visible()
+    test_tutorial_hint_renders_without_error()
     test_tutorial_seen_saver_none_allows_legacy_overlay()
     print("All solo_game tests passed.")
