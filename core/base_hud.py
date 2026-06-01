@@ -75,7 +75,7 @@ class BaseHud:
         # ラベル
         self._blit_text(
             screen,
-            f"Core HP {core_hp}/{max_hp}",
+            f"拠点 HP {core_hp}/{max_hp}",
             (bar_x + self.HP_BAR_WIDTH + 8, bar_y - 2),
         )
 
@@ -83,9 +83,9 @@ class BaseHud:
         right_x = SCREEN_WIDTH - self.MARGIN
         line_y = self.MARGIN
         for text in (
-            f"Resource: {resource}",
-            f"Wave: {wave}",
-            f"Generation: {generation}",
+            f"リソース: {resource}",
+            f"襲撃回数: {wave}",
+            f"世代: {generation}",
         ):
             self._blit_text_right(screen, text, (right_x, line_y))
             line_y += self.LINE_HEIGHT
