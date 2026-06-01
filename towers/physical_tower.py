@@ -26,6 +26,7 @@ class PhysicalTower(BaseTower):
     """物理タワー（高単発火力）。"""
 
     element: ClassVar[str] = "physical"
+    image_name: ClassVar[str] = "tower_physical.png"
 
     def __init__(
         self,

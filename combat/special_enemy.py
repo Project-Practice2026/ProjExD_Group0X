@@ -15,9 +15,7 @@ import pygame as pg
 try:
     from ..core.base_enemy import BaseEnemy
     from ..core.constants import (
-        COLOR_FAST,
         COLOR_SHIELD,
-        COLOR_SHIELDED,
         FAST_ENEMY_DAMAGE,
         FAST_ENEMY_HP,
         FAST_ENEMY_REWARD,
@@ -33,9 +31,7 @@ try:
 except ImportError:
     from core.base_enemy import BaseEnemy
     from core.constants import (
-        COLOR_FAST,
         COLOR_SHIELD,
-        COLOR_SHIELDED,
         FAST_ENEMY_DAMAGE,
         FAST_ENEMY_HP,
         FAST_ENEMY_REWARD,
@@ -55,6 +51,9 @@ class FastEnemy(BaseEnemy):
 
     special_type: ClassVar[str] = "fast"
 
+    image_name: str = "enemy_fast.png"
+    image_size: tuple[int, int] = (32, 32)
+
     def __init__(self, pos: tuple[float, float] = (0.0, 0.0)) -> None:
         super().__init__(
             pos=pos,
@@ -65,15 +64,21 @@ class FastEnemy(BaseEnemy):
         )
 
     def draw(self, screen: pg.Surface) -> None:
-        """高速敵を通常敵より小さな黄色円で描画する。"""
-        x, y = int(self._pos[0]), int(self._pos[1])
-        pg.draw.circle(screen, COLOR_FAST, (x, y), self.DEFAULT_RADIUS - 2)
+        """高速敵を画像で描画する。"""
+        self.rect.center = (
+            int(self._pos[0]),
+            int(self._pos[1]),
+        )
+        screen.blit(self.image, self.rect)
 
 
 class ShieldedEnemy(BaseEnemy):
     """盾を持つ敵。盾HPが残っている間、ダメージはまず盾に吸収される。"""
 
     special_type: ClassVar[str] = "shielded"
+
+    image_name: str = "enemy_shielded.png"
+    image_size: tuple[int, int] = (32, 32)
 
     def __init__(self, pos: tuple[float, float] = (0.0, 0.0)) -> None:
         super().__init__(
@@ -110,14 +115,18 @@ class ShieldedEnemy(BaseEnemy):
             super().take_damage(amount)
 
     def draw(self, screen: pg.Surface) -> None:
-        """盾持ち敵本体と、盾が残っている間だけ外周リングを描画する。"""
-        x, y = int(self._pos[0]), int(self._pos[1])
-        pg.draw.circle(screen, COLOR_SHIELDED, (x, y), self.DEFAULT_RADIUS + 2)
+        """盾持ち敵を画像で描画し、盾が残っている間だけ外周リングを描画する。"""
+        self.rect.center = (
+            int(self._pos[0]),
+            int(self._pos[1]),
+        )
+        screen.blit(self.image, self.rect)
+
         if self._shield > 0:
             pg.draw.circle(
                 screen,
                 COLOR_SHIELD,
-                (x, y),
+                (int(self._pos[0]), int(self._pos[1])),
                 self.DEFAULT_RADIUS + 4,
                 width=2,
             )

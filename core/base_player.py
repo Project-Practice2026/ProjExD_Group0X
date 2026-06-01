@@ -8,11 +8,11 @@ from __future__ import annotations
 import pygame as pg
 
 from .constants import (
-    COLOR_PLAYER,
     PLAYER_MAX_HP,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
 )
+from .image_cache import load_scaled_image
 
 
 class BasePlayer:
@@ -20,6 +20,9 @@ class BasePlayer:
 
     DEFAULT_RADIUS: int = 14
     DEFAULT_SPEED: float = 220.0
+
+    image_name: str = "player_fighter.png"
+    image_size: tuple[int, int] = (32, 32)
 
     def __init__(
         self,
@@ -35,6 +38,9 @@ class BasePlayer:
         self._hp: int = max_hp
         self._speed: float = self.DEFAULT_SPEED
 
+        self.image: pg.Surface = load_scaled_image(self.image_name, self.image_size)
+        self.rect: pg.Rect = self.image.get_rect(center=(int(self._pos[0]), int(self._pos[1])))
+
     def get_player_id(self) -> int:
         """ネットワーク入力の紐付けに使うプレイヤー ID を返す。"""
         return self._player_id
@@ -46,6 +52,7 @@ class BasePlayer:
     def set_pos(self, x: float, y: float) -> None:
         """現在座標を設定する。"""
         self._pos = (x, y)
+        self.rect.center = (int(x), int(y))
 
     def get_hp(self) -> int:
         """現在 HP を返す。"""
@@ -68,8 +75,12 @@ class BasePlayer:
         new_x = max(0.0, min(float(SCREEN_WIDTH), x + dx * self._speed * dt))
         new_y = max(0.0, min(float(SCREEN_HEIGHT), y + dy * self._speed * dt))
         self._pos = (new_x, new_y)
+        self.rect.center = (int(new_x), int(new_y))
 
     def draw(self, screen: pg.Surface) -> None:
-        """プレイヤーを現在座標に青い円で描画する。"""
-        x, y = int(self._pos[0]), int(self._pos[1])
-        pg.draw.circle(screen, COLOR_PLAYER, (x, y), self.DEFAULT_RADIUS)
+        """プレイヤーを画像で描画する。"""
+        self.rect.center = (
+            int(self._pos[0]),
+            int(self._pos[1]),
+        )
+        screen.blit(self.image, self.rect)

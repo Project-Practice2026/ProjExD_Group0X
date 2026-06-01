@@ -8,7 +8,6 @@ from __future__ import annotations
 import pygame as pg
 
 from .constants import (
-    COLOR_FORTRESS,
     COLOR_HP_BAR_BG,
     COLOR_HP_BAR_FG,
     FORTRESS_MAX_HP,
@@ -17,6 +16,7 @@ from .constants import (
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
 )
+from .image_cache import load_scaled_image
 
 
 class Fortress:
@@ -26,6 +26,9 @@ class Fortress:
     HP_BAR_WIDTH: int = 80
     HP_BAR_HEIGHT: int = 6
     HP_BAR_OFFSET: int = 12
+
+    image_name: str = "fortress.png"
+    image_size: tuple[int, int] = (96, 96)
 
     def __init__(
         self,
@@ -38,6 +41,9 @@ class Fortress:
         self._max_hp: int = max_hp
         self._hp: int = max_hp
 
+        self.image: pg.Surface = load_scaled_image(self.image_name, self.image_size)
+        self.rect: pg.Rect = self.image.get_rect(center=(int(self._pos[0]), int(self._pos[1])))
+
     def get_pos(self) -> tuple[float, float]:
         """Pos を返す。"""
         return self._pos
@@ -45,6 +51,7 @@ class Fortress:
     def set_pos(self, x: float, y: float) -> None:
         """Pos を設定する。"""
         self._pos = (x, y)
+        self.rect.center = (int(x), int(y))
 
     def get_hp(self) -> int:
         """Hp を返す。"""
@@ -69,13 +76,14 @@ class Fortress:
         return self._hp <= 0
 
     def draw(self, screen: pg.Surface) -> None:
-        """拠点本体と HP バーを描画する。"""
+        """拠点画像と HP バーを描画する。"""
         x, y = int(self._pos[0]), int(self._pos[1])
-        pg.draw.circle(screen, COLOR_FORTRESS, (x, y), self.DEFAULT_RADIUS)
+        self.rect.center = (x, y)
+        screen.blit(self.image, self.rect)
 
         # HP バー
         bar_x = x - self.HP_BAR_WIDTH // 2
-        bar_y = y - self.DEFAULT_RADIUS - self.HP_BAR_OFFSET
+        bar_y = y - self.image_size[1] // 2 - self.HP_BAR_OFFSET
         pg.draw.rect(
             screen,
             COLOR_HP_BAR_BG,

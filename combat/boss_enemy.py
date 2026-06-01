@@ -16,13 +16,11 @@ try:
     from ..core.constants import (
         BOSS_DAMAGE,
         BOSS_HP_MULTIPLIER,
-        BOSS_RADIUS,
         BOSS_REWARD,
         BOSS_SPECIAL_DAMAGE,
         BOSS_SPECIAL_INTERVAL,
         BOSS_SPECIAL_RADIUS,
         BOSS_SPEED,
-        COLOR_BOSS,
         COLOR_EFFECT_BOSS_DEATH,
         COLOR_EFFECT_SHOCKWAVE,
         ENEMY_BASE_HP,
@@ -37,13 +35,11 @@ except ImportError:
     from core.constants import (
         BOSS_DAMAGE,
         BOSS_HP_MULTIPLIER,
-        BOSS_RADIUS,
         BOSS_REWARD,
         BOSS_SPECIAL_DAMAGE,
         BOSS_SPECIAL_INTERVAL,
         BOSS_SPECIAL_RADIUS,
         BOSS_SPEED,
-        COLOR_BOSS,
         COLOR_EFFECT_BOSS_DEATH,
         COLOR_EFFECT_SHOCKWAVE,
         ENEMY_BASE_HP,
@@ -58,6 +54,8 @@ class BossEnemy(BaseEnemy):
     """ボス敵。"""
 
     BOSS_HP: int = ENEMY_BASE_HP * BOSS_HP_MULTIPLIER
+    image_name: str = "boss.png"
+    image_size: tuple[int, int] = (64, 64)
 
     def __init__(
         self,
@@ -130,16 +128,19 @@ class BossEnemy(BaseEnemy):
         super().update(fortress, dt)
 
     def draw(self, screen: pg.Surface) -> None:
-        """ボス本体と頭上の HP バーを描画する。"""
+        """ボス本体画像と頭上の HP バーを描画する。"""
         x, y = int(self._pos[0]), int(self._pos[1])
-        pg.draw.circle(screen, COLOR_BOSS, (x, y), BOSS_RADIUS)
+        self.rect.center = (x, y)
+        screen.blit(self.image, self.rect)
+
         # HP バー
         ratio = self._hp / self._max_hp if self._max_hp > 0 else 0
         bar_w = 50
         bar_h = 5
-        pg.draw.rect(screen, (60, 60, 60), (x - bar_w // 2, y - BOSS_RADIUS - 10, bar_w, bar_h))
+        bar_y = y - self.image_size[1] // 2 - 10
+        pg.draw.rect(screen, (60, 60, 60), (x - bar_w // 2, bar_y, bar_w, bar_h))
         pg.draw.rect(
             screen,
             COLOR_EFFECT_BOSS_DEATH,
-            (x - bar_w // 2, y - BOSS_RADIUS - 10, int(bar_w * ratio), bar_h),
+            (x - bar_w // 2, bar_y, int(bar_w * ratio), bar_h),
         )

@@ -18,6 +18,7 @@ from .constants import (
     TOWER_BASE_DAMAGE,
     TOWER_BASE_RANGE,
 )
+from .image_cache import load_scaled_image
 
 
 class BaseTower:
@@ -25,6 +26,9 @@ class BaseTower:
 
     DEFAULT_RADIUS: int = 16
     RANGE_RING_ALPHA: int = 40
+
+    image_name: str = "tower_physical.png"
+    image_size: tuple[int, int] = (48, 48)
 
     def __init__(  # noqa: PLR0913 - タワー初期化に必要なパラメータをすべて kwarg 化するため許容
         self,
@@ -45,6 +49,9 @@ class BaseTower:
         # アップグレードシステム用（担当③）
         self._level: int = 1
         self._total_invested: int = max(0, int(purchase_cost))
+
+        self.image: pg.Surface = load_scaled_image(self.image_name, self.image_size)
+        self.rect: pg.Rect = self.image.get_rect(center=(int(self._pos[0]), int(self._pos[1])))
 
     @property
     def damage(self) -> int:
@@ -93,6 +100,7 @@ class BaseTower:
     def set_pos(self, x: float, y: float) -> None:
         """Pos を設定する。"""
         self._pos = (x, y)
+        self.rect.center = (int(x), int(y))
 
     def get_range(self) -> float:
         """Range を返す。"""
@@ -178,9 +186,13 @@ class BaseTower:
         return [bullet]
 
     def draw(self, screen: pg.Surface) -> None:
-        """Surface に描画する。"""
+        """タワーを画像で描画する。"""
         x, y = int(self._pos[0]), int(self._pos[1])
-        # 射程の薄いリング
+        self._draw_range_ring(screen, x, y)
+        self.rect.center = (x, y)
+        screen.blit(self.image, self.rect)
+
+    def _draw_range_ring(self, screen: pg.Surface, x: int, y: int) -> None:
         try:
             ring = pg.Surface(
                 (int(self._range * 2), int(self._range * 2)),
@@ -194,6 +206,4 @@ class BaseTower:
             )
             screen.blit(ring, (x - int(self._range), y - int(self._range)))
         except (pg.error, ValueError):
-            # SRCALPHA が使えない環境向けのフォールバック
             pass
-        pg.draw.circle(screen, COLOR_TOWER, (x, y), self.DEFAULT_RADIUS)

@@ -10,8 +10,9 @@ import math
 
 import pygame as pg
 
-from .constants import COLOR_ENEMY, ENEMY_BASE_DAMAGE, ENEMY_BASE_HP, ENEMY_BASE_REWARD
+from .constants import ENEMY_BASE_DAMAGE, ENEMY_BASE_HP, ENEMY_BASE_REWARD
 from .fortress import Fortress
+from .image_cache import load_scaled_image
 
 
 class BaseEnemy:
@@ -20,6 +21,9 @@ class BaseEnemy:
     DEFAULT_RADIUS: int = 10
     DEFAULT_SPEED: float = 80.0
     CONTACT_DISTANCE: float = 32.0
+
+    image_name: str = "enemy.png"
+    image_size: tuple[int, int] = (32, 32)
 
     def __init__(
         self,
@@ -39,6 +43,9 @@ class BaseEnemy:
         # 速度低下バフ（担当③の氷タワー等で利用）
         self._speed_factor: float = 1.0
         self._slow_remaining: float = 0.0
+
+        self.image: pg.Surface = load_scaled_image(self.image_name, self.image_size)
+        self.rect: pg.Rect = self.image.get_rect(center=(int(self._pos[0]), int(self._pos[1])))
 
     @property
     def reward(self) -> int:
@@ -171,6 +178,9 @@ class BaseEnemy:
         self._pos = (nx, ny)
 
     def draw(self, screen: pg.Surface) -> None:
-        """通常敵を現在座標に赤い円で描画する。"""
-        x, y = int(self._pos[0]), int(self._pos[1])
-        pg.draw.circle(screen, COLOR_ENEMY, (x, y), self.DEFAULT_RADIUS)
+        """通常敵を画像で描画する。"""
+        self.rect.center = (
+            int(self._pos[0]),
+            int(self._pos[1]),
+        )
+        screen.blit(self.image, self.rect)

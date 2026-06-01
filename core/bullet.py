@@ -10,7 +10,10 @@ import math
 import pygame as pg
 
 from .base_enemy import BaseEnemy
-from .constants import BULLET_SPEED, COLOR_BULLET, TOWER_BASE_DAMAGE
+from .constants import BULLET_SPEED, TOWER_BASE_DAMAGE
+from .image_cache import load_scaled_image
+
+BULLET_SIZE: tuple[int, int] = (8, 8)
 
 
 class Bullet:
@@ -18,6 +21,9 @@ class Bullet:
 
     DEFAULT_RADIUS: int = 4
     HIT_DISTANCE: float = 10.0
+
+    image_name: str = "bullet.png"
+    image_size: tuple[int, int] = BULLET_SIZE
 
     def __init__(
         self,
@@ -31,6 +37,9 @@ class Bullet:
         self._speed: float = speed
         self._damage: int = damage
         self._consumed: bool = False
+
+        self.image: pg.Surface = load_scaled_image(self.image_name, self.image_size)
+        self.rect: pg.Rect = self.image.get_rect(center=(int(self._pos[0]), int(self._pos[1])))
 
     def get_pos(self) -> tuple[float, float]:
         """Pos を返す。"""
@@ -68,6 +77,8 @@ class Bullet:
         else:
             self._pos = (x + vx / dist * step, y + vy / dist * step)
 
+        self.rect.center = (int(self._pos[0]), int(self._pos[1]))
+
     def check_hit(self, enemies: list[BaseEnemy] | None = None) -> bool:
         """命中判定。命中したら対象にダメージを与え、True を返す。
 
@@ -90,6 +101,9 @@ class Bullet:
         return False
 
     def draw(self, screen: pg.Surface) -> None:
-        """Surface に描画する。"""
-        x, y = int(self._pos[0]), int(self._pos[1])
-        pg.draw.circle(screen, COLOR_BULLET, (x, y), self.DEFAULT_RADIUS)
+        """弾を画像で描画する。"""
+        self.rect.center = (
+            int(self._pos[0]),
+            int(self._pos[1]),
+        )
+        screen.blit(self.image, self.rect)

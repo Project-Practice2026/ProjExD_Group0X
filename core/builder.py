@@ -25,6 +25,7 @@ class Builder(BasePlayer):
 
     DEFAULT_TOWER_COST: int = 30
     DEFAULT_RADIUS: int = 12
+    image_name: ClassVar[str] = "player_builder.png"
     TOWER_TYPES: ClassVar[tuple[str, ...]] = ("fire", "ice", "lightning", "physical")
     TOWER_TYPE_KEYS: ClassVar[dict[int, str]] = {
         pg.K_1: "fire",
@@ -134,6 +135,7 @@ class Builder(BasePlayer):
 
     def draw(self, screen: pg.Surface) -> None:
         """Surface に描画する。"""
+        super().draw(screen)
         x, y = int(self._pos[0]), int(self._pos[1])
         pg.draw.rect(
             screen,
