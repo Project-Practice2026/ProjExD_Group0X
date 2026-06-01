@@ -150,35 +150,35 @@ class TutorialOverlay:
         """説明文をパネル内に描画する。"""
         x = panel_rect.x + self.PANEL_PADDING
         y = panel_rect.y + self.PANEL_PADDING
-        title = self._title_font.render("Controls", True, COLOR_TEXT)
+        title = self._title_font.render("操作説明", True, COLOR_TEXT)
         screen.blit(title, (x, y))
         y += TUTORIAL_TITLE_TO_BODY_GAP
 
         sections = [
             (
-                "Player 1 / Builder",
+                "プレイヤー1 / 建築担当",
                 [
-                    "1-4: select tower type",
-                    "Left click: place tower",
-                    "Right click: select tower",
-                    "Space: request next wave",
+                    "1-4: タワーの種類を選択",
+                    "左クリック: タワーを配置",
+                    "右クリック: タワーを選択",
+                    "Space: 次のウェーブを開始",
                 ],
             ),
             (
-                "Player 2 / Fighter",
+                "プレイヤー 2 / 戦闘担当",
                 [
-                    "WASD: move",
-                    "Shift: dash",
-                    "J: attack",
-                    "K: use skill",
-                    "L: repair nearby tower",
+                    "WASD: キャラクター移動",
+                    "Shift: ダッシュ",
+                    "J: 通常攻撃",
+                    "K: スキルを使用",
+                    "L: 近くのタワーを修理",
                 ],
             ),
             (
-                "Weapons / Skills",
+                "共通武器 / スキル切り替え",
                 [
-                    "Q / E: switch weapon",
-                    "5 / 6: switch skill",
+                    "Q / E: 武器切り替え",
+                    "5 / 6: スキル切り替え",
                 ],
             ),
         ]
@@ -194,7 +194,7 @@ class TutorialOverlay:
             y += TUTORIAL_SECTION_BOTTOM_GAP
 
         self._draw_skip_option(screen, panel_rect)
-        hint = self._body_font.render("Press any key or click to close.", True, COLOR_TEXT)
+        hint = self._body_font.render("任意のキーを押すか、クリックで閉じる", True, COLOR_TEXT)
         hint_rect = hint.get_rect(
             bottomleft=(
                 panel_rect.x + self.PANEL_PADDING,
@@ -239,7 +239,7 @@ class TutorialOverlay:
                 [start, middle, end],
                 TUTORIAL_CHECK_MARK_WIDTH,
             )
-        label = self._body_font.render("Don't show again", True, COLOR_TEXT)
+        label = self._body_font.render("次回から表示しない", True, COLOR_TEXT)
         label_rect = label.get_rect(
             midleft=(
                 self._skip_checkbox_rect.right + self.SKIP_LABEL_GAP,
