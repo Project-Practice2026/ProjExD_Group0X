@@ -17,6 +17,8 @@ import pygame as pg
 
 from .constants import COLOR_BG, COLOR_TEXT, FPS, SCREEN_HEIGHT, SCREEN_WIDTH, SERVER_HOST
 
+from core.fonts import get_font
+
 # 選択肢: (戻り値, 表示ラベル)
 MENU_OPTIONS: list[tuple[str, str]] = [
     ("solo", "ソロプレイ  (1台 / 2人操作)"),
@@ -57,9 +59,9 @@ class MenuScene:
             list(options) if options is not None else list(MENU_OPTIONS)
         )
         self._index: int = 0
-        self._title_font: pg.font.Font = pg.font.SysFont(None, self.TITLE_FONT_SIZE)
-        self._option_font: pg.font.Font = pg.font.SysFont(None, self.OPTION_FONT_SIZE)
-        self._hint_font: pg.font.Font = pg.font.SysFont(None, self.HINT_FONT_SIZE)
+        self._title_font: pg.font.Font = get_font(self.TITLE_FONT_SIZE)
+        self._option_font: pg.font.Font = get_font(self.OPTION_FONT_SIZE)
+        self._hint_font: pg.font.Font = get_font(self.HINT_FONT_SIZE)
 
     # ----- selection logic（display 非依存） -----
 
