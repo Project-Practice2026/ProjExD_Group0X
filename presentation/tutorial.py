@@ -1,7 +1,7 @@
 """Tutorial overlay drawing for first-time players."""
 
 from __future__ import annotations
-from core.fonts import get_font
+
 import pygame as pg
 
 from core.constants import (
@@ -32,6 +32,7 @@ from core.constants import (
     TUTORIAL_TITLE_FONT_SIZE,
     TUTORIAL_TITLE_TO_BODY_GAP,
 )
+from core.fonts import get_font
 
 
 class TutorialOverlay:
