@@ -13,6 +13,7 @@ import pygame as pg
 from .base_enemy import BaseEnemy
 from .bullet import Bullet
 from .constants import (
+    COLOR_TOWER,
     TOWER_BASE_COOLDOWN,
     TOWER_BASE_DAMAGE,
     TOWER_BASE_RANGE,
@@ -186,8 +187,23 @@ class BaseTower:
 
     def draw(self, screen: pg.Surface) -> None:
         """タワーを画像で描画する。"""
-        self.rect.center = (
-            int(self._pos[0]),
-            int(self._pos[1]),
-        )
+        x, y = int(self._pos[0]), int(self._pos[1])
+        self._draw_range_ring(screen, x, y)
+        self.rect.center = (x, y)
         screen.blit(self.image, self.rect)
+
+    def _draw_range_ring(self, screen: pg.Surface, x: int, y: int) -> None:
+        try:
+            ring = pg.Surface(
+                (int(self._range * 2), int(self._range * 2)),
+                flags=pg.SRCALPHA,
+            )
+            pg.draw.circle(
+                ring,
+                (*COLOR_TOWER, self.RANGE_RING_ALPHA),
+                (int(self._range), int(self._range)),
+                int(self._range),
+            )
+            screen.blit(ring, (x - int(self._range), y - int(self._range)))
+        except (pg.error, ValueError):
+            pass
