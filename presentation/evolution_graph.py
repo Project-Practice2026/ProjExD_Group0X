@@ -117,7 +117,7 @@ class EvolutionGraph:
         pg.draw.rect(screen, GRAPH_GRID_COLOR, bg_rect, width=1)
 
         if len(self._records) < 2:
-            self._blit_label(screen, "Evolution Graph (no data)", (x + 4, y + 4))
+            self._blit_label(screen, "進化グラフ (データなし)", (x + 4, y + 4))
             return
 
         max_value = max(*(r.best for r in self._records), 1.0)
@@ -147,7 +147,7 @@ class EvolutionGraph:
         latest = self._records[-1]
         self._blit_label(
             screen,
-            f"Gen {latest.generation}  best={latest.best:.1f}  avg={latest.avg:.1f}",
+            f"世代 {latest.generation}  最高={latest.best:.1f}  平均={latest.avg:.1f}",
             (x + 4, y + 4),
         )
 

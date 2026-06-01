@@ -84,12 +84,12 @@ class ExtendedHud(BaseHud):
         if not tower_info:
             return
         lines = [
-            f"Tower: {tower_info.get('element', 'base').upper()}",
-            f" Lv  : {int(tower_info.get('level', 1))}",
-            f" DMG : {int(tower_info.get('damage', 0))}",
-            f" RNG : {int(tower_info.get('range', 0))}",
-            f" CD  : {float(tower_info.get('cooldown', 0.0)):.2f}s",
-            f" Cost: {int(tower_info.get('cost', 0))}",
+            f"タワー: {tower_info.get('element', 'base').upper()}",
+            f" レベル: {int(tower_info.get('level', 1))}",
+            f" 攻撃力: {int(tower_info.get('damage', 0))}",
+            f" 射程: {int(tower_info.get('range', 0))}",
+            f" クールダウン: {float(tower_info.get('cooldown', 0.0)):.2f}s",
+            f" コスト: {int(tower_info.get('cost', 0))}",
         ]
         height = self.PANEL_PADDING * 2 + self.PANEL_LINE_HEIGHT * len(lines)
         x = SCREEN_WIDTH - self.PANEL_WIDTH - self.MARGIN
@@ -149,7 +149,7 @@ class ExtendedHud(BaseHud):
     ) -> None:
         if best_fitness is None:
             return
-        text = f"Best Fitness: {float(best_fitness):.1f}"
+        text = f"最高適応度: {float(best_fitness):.1f}"
         surface = self._panel_font.render(text, True, COLOR_TEXT)
         rect = surface.get_rect(midtop=(SCREEN_WIDTH // 2, self.MARGIN))
         screen.blit(surface, rect)
@@ -179,7 +179,7 @@ class ExtendedHud(BaseHud):
                 (bar_x, bar_y, fg_width, self.OPPONENT_BAR_HEIGHT),
             )
         label = self._panel_font.render(
-            f"Opp HP {opponent_hp}/{max_hp}",
+            f"相手のHP: {opponent_hp}/{max_hp}",
             True,
             COLOR_TEXT,
         )

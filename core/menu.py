@@ -15,16 +15,18 @@ from __future__ import annotations
 
 import pygame as pg
 
+from core.fonts import get_font
+
 from .constants import COLOR_BG, COLOR_TEXT, FPS, SCREEN_HEIGHT, SCREEN_WIDTH, SERVER_HOST
 
 # 選択肢: (戻り値, 表示ラベル)
 MENU_OPTIONS: list[tuple[str, str]] = [
-    ("solo", "Solo  (1 PC / 2 players)"),
-    ("host", "Host  (Player 1)"),
-    ("client", "Client  (Player 2)"),
-    ("versus", "Versus  (1 PC / 2 fields)"),
-    ("tutorial", "Tutorial  (Controls)"),
-    ("quit", "Quit"),
+    ("solo", "ソロプレイ  (1台 / 2人操作)"),
+    ("host", "ホスト起動  (プレイヤー1)"),
+    ("client", "クライアント接続  (プレイヤー2)"),
+    ("versus", "対戦モード  (1台 / 2画面)"),
+    ("tutorial", "チュートリアル  (操作説明)"),
+    ("quit", "ゲーム終了"),
 ]
 
 
@@ -36,13 +38,13 @@ class MenuScene:
     単体テストしやすい。
     """
 
-    TITLE: str = "CO-EVOLUTION TOWER DEFENSE"
+    TITLE: str = "共進化砦"
     TITLE_FONT_SIZE: int = 48
     OPTION_FONT_SIZE: int = 32
     HINT_FONT_SIZE: int = 20
     OPTION_GAP: int = 56
     COLOR_SELECTED: tuple[int, int, int] = (255, 220, 120)
-    HINT: str = "[Up/Down] select   [Enter] decide   [Esc] quit"
+    HINT: str = "[↑↓] 選択   [Enter] 決定   [Esc] 終了"
 
     def __init__(
         self,
@@ -57,9 +59,9 @@ class MenuScene:
             list(options) if options is not None else list(MENU_OPTIONS)
         )
         self._index: int = 0
-        self._title_font: pg.font.Font = pg.font.SysFont(None, self.TITLE_FONT_SIZE)
-        self._option_font: pg.font.Font = pg.font.SysFont(None, self.OPTION_FONT_SIZE)
-        self._hint_font: pg.font.Font = pg.font.SysFont(None, self.HINT_FONT_SIZE)
+        self._title_font: pg.font.Font = get_font(self.TITLE_FONT_SIZE)
+        self._option_font: pg.font.Font = get_font(self.OPTION_FONT_SIZE)
+        self._hint_font: pg.font.Font = get_font(self.HINT_FONT_SIZE)
 
     # ----- selection logic（display 非依存） -----
 
@@ -180,8 +182,8 @@ class IpInputScene:
     単体テストしやすい。
     """
 
-    PROMPT: str = "Enter host IP"
-    HINT: str = "[0-9 .] input   [Backspace] delete   [Enter] connect   [Esc] back"
+    PROMPT: str = "接続先ホストの IP アドレスを入力してください"
+    HINT: str = "[0-9 .] 入力 [Backspace] 削除 [Enter] 接続 [Esc] 戻る"
     INPUT_FONT_SIZE: int = 40
     LABEL_FONT_SIZE: int = 24
     MAX_LENGTH: int = 15  # "255.255.255.255"
@@ -195,8 +197,8 @@ class IpInputScene:
         self._clock: pg.time.Clock = pg.time.Clock()
         self._text: str = initial_ip
         self._error: str = ""
-        self._input_font: pg.font.Font = pg.font.SysFont(None, self.INPUT_FONT_SIZE)
-        self._label_font: pg.font.Font = pg.font.SysFont(None, self.LABEL_FONT_SIZE)
+        self._input_font: pg.font.Font = get_font(self.INPUT_FONT_SIZE)
+        self._label_font: pg.font.Font = get_font(self.LABEL_FONT_SIZE)
 
     # ----- input logic（display 非依存） -----
 
@@ -225,7 +227,7 @@ class IpInputScene:
         """確定を試みる。妥当なら IP 文字列を返し、無効ならエラーを設定して None。"""
         if is_valid_ipv4(self._text):
             return self._text
-        self._error = "Invalid IP address (e.g. 192.168.1.10)"
+        self._error = "無効なIPアドレス形式です(例: 192.168.1.10)"
         return None
 
     def handle_event(self, event: pg.event.Event) -> tuple[bool, str | None]:
