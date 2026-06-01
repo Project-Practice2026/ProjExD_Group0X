@@ -179,7 +179,7 @@ class ExtendedHud(BaseHud):
                 (bar_x, bar_y, fg_width, self.OPPONENT_BAR_HEIGHT),
             )
         label = self._panel_font.render(
-            f"相手のHP {opponent_hp}/{max_hp}",
+            f"相手のHP: {opponent_hp}/{max_hp}",
             True,
             COLOR_TEXT,
         )
