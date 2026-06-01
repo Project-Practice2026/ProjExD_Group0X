@@ -197,8 +197,8 @@ class IpInputScene:
         self._clock: pg.time.Clock = pg.time.Clock()
         self._text: str = initial_ip
         self._error: str = ""
-        self._input_font: pg.font.Font = pg.font.SysFont(None, self.INPUT_FONT_SIZE)
-        self._label_font: pg.font.Font = pg.font.SysFont(None, self.LABEL_FONT_SIZE)
+        self._input_font: pg.font.Font = get_font(self.INPUT_FONT_SIZE)
+        self._label_font: pg.font.Font = get_font(self.LABEL_FONT_SIZE)
 
     # ----- input logic（display 非依存） -----
 
