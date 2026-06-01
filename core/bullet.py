@@ -6,12 +6,12 @@ BaseTower から発射され、対象の BaseEnemy に向かって移動する�
 from __future__ import annotations
 
 import math
-from pathlib import Path
 
 import pygame as pg
 
 from .base_enemy import BaseEnemy
 from .constants import BULLET_SPEED, TOWER_BASE_DAMAGE
+from .image_cache import load_scaled_image
 
 BULLET_SIZE: tuple[int, int] = (8, 8)
 
@@ -38,9 +38,8 @@ class Bullet:
         self._damage: int = damage
         self._consumed: bool = False
 
-        image = pg.image.load(Path("assets") / "fig" / self.image_name)
-        self.image = pg.transform.scale(image, self.image_size)
-        self.rect = self.image.get_rect(center=(int(self._pos[0]), int(self._pos[1])))
+        self.image: pg.Surface = load_scaled_image(self.image_name, self.image_size)
+        self.rect: pg.Rect = self.image.get_rect(center=(int(self._pos[0]), int(self._pos[1])))
 
     def get_pos(self) -> tuple[float, float]:
         """Pos を返す。"""

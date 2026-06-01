@@ -5,8 +5,6 @@ HP を持ち、敵が接触するとダメージを受ける。HP が 0 にな�
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pygame as pg
 
 from .constants import (
@@ -18,6 +16,7 @@ from .constants import (
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
 )
+from .image_cache import load_scaled_image
 
 
 class Fortress:
@@ -42,9 +41,8 @@ class Fortress:
         self._max_hp: int = max_hp
         self._hp: int = max_hp
 
-        image = pg.image.load(Path("assets") / "fig" / self.image_name)
-        self.image = pg.transform.scale(image, self.image_size)
-        self.rect = self.image.get_rect(center=(int(self._pos[0]), int(self._pos[1])))
+        self.image: pg.Surface = load_scaled_image(self.image_name, self.image_size)
+        self.rect: pg.Rect = self.image.get_rect(center=(int(self._pos[0]), int(self._pos[1])))
 
     def get_pos(self) -> tuple[float, float]:
         """Pos を返す。"""

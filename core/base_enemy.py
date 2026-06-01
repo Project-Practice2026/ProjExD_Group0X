@@ -7,12 +7,12 @@ EvolvedEnemy（担当①）、BossEnemy / SpecialEnemy（担当④）が継承�
 from __future__ import annotations
 
 import math
-from pathlib import Path
 
 import pygame as pg
 
 from .constants import ENEMY_BASE_DAMAGE, ENEMY_BASE_HP, ENEMY_BASE_REWARD
 from .fortress import Fortress
+from .image_cache import load_scaled_image
 
 
 class BaseEnemy:
@@ -44,9 +44,8 @@ class BaseEnemy:
         self._speed_factor: float = 1.0
         self._slow_remaining: float = 0.0
 
-        image = pg.image.load(Path("assets") / "fig" / self.image_name)
-        self.image = pg.transform.scale(image, self.image_size)
-        self.rect = self.image.get_rect(center=(int(self._pos[0]), int(self._pos[1])))
+        self.image: pg.Surface = load_scaled_image(self.image_name, self.image_size)
+        self.rect: pg.Rect = self.image.get_rect(center=(int(self._pos[0]), int(self._pos[1])))
 
     @property
     def reward(self) -> int:
