@@ -15,9 +15,9 @@ from __future__ import annotations
 
 import pygame as pg
 
-from .constants import COLOR_BG, COLOR_TEXT, FPS, SCREEN_HEIGHT, SCREEN_WIDTH, SERVER_HOST
-
 from core.fonts import get_font
+
+from .constants import COLOR_BG, COLOR_TEXT, FPS, SCREEN_HEIGHT, SCREEN_WIDTH, SERVER_HOST
 
 # 選択肢: (戻り値, 表示ラベル)
 MENU_OPTIONS: list[tuple[str, str]] = [
