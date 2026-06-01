@@ -48,6 +48,8 @@ class TutorialOverlay:
     CLOSE_BUTTON_SIZE: int = TUTORIAL_CLOSE_BUTTON_SIZE
     SKIP_CHECKBOX_SIZE: int = TUTORIAL_SKIP_CHECKBOX_SIZE
     SKIP_LABEL_GAP: int = TUTORIAL_SKIP_LABEL_GAP
+    
+    HINT_TOP_GAP: int = 15
 
     def __init__(self) -> None:
         """フォントと表示状態を初期化する。"""
@@ -195,11 +197,16 @@ class TutorialOverlay:
             y += TUTORIAL_SECTION_BOTTOM_GAP
 
         self._draw_skip_option(screen, panel_rect)
+        
+        # 🟢 チェックボックス行の位置を取得し、絶対に重ならない安全な y 座標を計算する
         hint = self._body_font.render("任意のキーを押すか、クリックで閉じる", True, COLOR_TEXT)
+        skip_row_y = panel_rect.bottom - self.PANEL_PADDING - TUTORIAL_SKIP_ROW_BOTTOM_GAP
+        hint_y = skip_row_y + self.SKIP_CHECKBOX_SIZE + self.HINT_TOP_GAP
+
         hint_rect = hint.get_rect(
-            bottomleft=(
+            topleft=(
                 panel_rect.x + self.PANEL_PADDING,
-                panel_rect.bottom - 15,
+                hint_y,
             )
         )
         screen.blit(hint, hint_rect)
