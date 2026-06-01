@@ -135,7 +135,7 @@ def _weighted_fitness(net: NeuralNet, weights: FitnessWeights) -> float:
     )
 
 
-def _evaluate_population(
+def evaluate_population(
     manager: EvolutionManager,
     weights: FitnessWeights,
 ) -> list[float]:
@@ -148,15 +148,15 @@ def run_parameter_grid(weights: FitnessWeights) -> list[TuningRow]:
     rows: list[TuningRow] = []
     for mutation_rate in EVOLUTION_TUNING_MUTATION_RATES:
         for tournament_size in EVOLUTION_TUNING_TOURNAMENT_SIZES:
-            seed = EVOLUTION_TUNING_SEED + int(mutation_rate * 1000) + tournament_size
-            np.random.seed(seed)
+            # 各組み合わせを同じ初期個体群から開始し、差をハイパーパラメータ由来に寄せる。
+            np.random.seed(EVOLUTION_TUNING_SEED)
             manager = TunableEvolutionManager(
                 population_size=EVOLUTION_TUNING_POPULATION_SIZE,
                 mutation_rate=mutation_rate,
                 tournament_size=tournament_size,
             )
             for generation in range(EVOLUTION_TUNING_GENERATION_COUNT + 1):
-                fitness = _evaluate_population(manager, weights)
+                fitness = evaluate_population(manager, weights)
                 rows.append(
                     TuningRow(
                         mutation_rate=mutation_rate,
@@ -197,7 +197,7 @@ def run_weight_sweep() -> list[WeightSweepRow]:
             tournament_size=EVOLUTION_TOURNAMENT_SIZE,
         )
         for generation in range(EVOLUTION_TUNING_GENERATION_COUNT + 1):
-            fitness = _evaluate_population(manager, profile)
+            fitness = evaluate_population(manager, profile)
             rows.append(
                 WeightSweepRow(
                     weight_profile=profile.name,

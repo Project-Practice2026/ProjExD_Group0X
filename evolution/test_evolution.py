@@ -22,6 +22,7 @@ from core.constants import (
 )
 from core.fortress import Fortress
 from core.world import World
+from evolution import tune_parameters
 from evolution.evolution_driver import EvolutionDriver
 from evolution.evolution_manager import EvolutionManager
 from evolution.evolved_enemy import EvolvedEnemy
@@ -509,6 +510,43 @@ def test_evolution_improves_average_fitness_with_fixed_seed() -> None:
 
     assert averages[-1] > averages[0]
     assert all(next_best >= best - 1e-12 for best, next_best in pairwise(bests))
+
+
+def test_parameter_grid_reuses_initial_seed_for_each_combination() -> None:
+    """Parameter grid starts every combination from the same initial population."""
+    random_state = np.random.get_state()
+    original_mutation_rates = tune_parameters.EVOLUTION_TUNING_MUTATION_RATES
+    original_tournament_sizes = tune_parameters.EVOLUTION_TUNING_TOURNAMENT_SIZES
+    original_population_size = tune_parameters.EVOLUTION_TUNING_POPULATION_SIZE
+    original_generation_count = tune_parameters.EVOLUTION_TUNING_GENERATION_COUNT
+    mutation_rates = (0.01, 0.20)
+    tournament_sizes = (2, 5)
+
+    try:
+        tune_parameters.EVOLUTION_TUNING_MUTATION_RATES = mutation_rates
+        tune_parameters.EVOLUTION_TUNING_TOURNAMENT_SIZES = tournament_sizes
+        tune_parameters.EVOLUTION_TUNING_POPULATION_SIZE = 6
+        tune_parameters.EVOLUTION_TUNING_GENERATION_COUNT = 0
+        weights = tune_parameters.FitnessWeights(
+            name="test",
+            damage=1.0,
+            survival=1.0,
+            distance=1.0,
+        )
+
+        rows = tune_parameters.run_parameter_grid(weights)
+    finally:
+        tune_parameters.EVOLUTION_TUNING_MUTATION_RATES = original_mutation_rates
+        tune_parameters.EVOLUTION_TUNING_TOURNAMENT_SIZES = original_tournament_sizes
+        tune_parameters.EVOLUTION_TUNING_POPULATION_SIZE = original_population_size
+        tune_parameters.EVOLUTION_TUNING_GENERATION_COUNT = original_generation_count
+        np.random.set_state(random_state)
+
+    generation_zero_rows = [row for row in rows if row.gen == 0]
+    assert len(generation_zero_rows) == len(mutation_rates) * len(tournament_sizes)
+    first_row = generation_zero_rows[0]
+    assert all(row.best_fitness == first_row.best_fitness for row in generation_zero_rows)
+    assert all(row.avg_fitness == first_row.avg_fitness for row in generation_zero_rows)
 
 
 def test_evolution_driver_waits_until_population_is_evaluated() -> None:
