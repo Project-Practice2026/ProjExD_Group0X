@@ -43,9 +43,11 @@ SERVER_HOST: str = "127.0.0.1"
 SERVER_PORT: int = 50000
 
 # ===== 進化AI（担当①） =====
-FITNESS_DAMAGE_WEIGHT: float = 10.0
-FITNESS_SURVIVAL_WEIGHT: float = 1.0
-FITNESS_DISTANCE_WEIGHT: float = 5.0
+# 2026-06-01 の拡張実験 (evolution.run_extended_experiments) で最も高い
+# 最終適応度を示した aggressive プロファイルを既定値に採用する。
+FITNESS_DAMAGE_WEIGHT: float = 14.0
+FITNESS_SURVIVAL_WEIGHT: float = 0.5
+FITNESS_DISTANCE_WEIGHT: float = 4.0
 EVOLUTION_MUTATION_RATE: float = 0.05
 EVOLUTION_ELITE_RATE: float = 0.2
 EVOLUTION_TOURNAMENT_SIZE: int = 3
