@@ -159,7 +159,9 @@ class ClientGame(Game):
         self._screen.fill(COLOR_BG)
         if state is None:
             # Game.run() が draw() 後に flip するため、早期 return でも表示される。
-            self._blit_centered("ホストからの応答を待ってます...", y_offset=CLIENT_WAITING_TEXT_Y_OFFSET)
+            self._blit_centered(
+                "ホストからの応答を待ってます...", y_offset=CLIENT_WAITING_TEXT_Y_OFFSET
+                )
             return
         self._draw_fortress(state)
         self._draw_towers(state)
