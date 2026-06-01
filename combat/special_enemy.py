@@ -8,7 +8,6 @@
 from __future__ import annotations
 
 import random
-from pathlib import Path
 from typing import ClassVar
 
 import pygame as pg
@@ -64,10 +63,6 @@ class FastEnemy(BaseEnemy):
             reward=FAST_ENEMY_REWARD,
         )
 
-        image = pg.image.load(Path("assets") / "fig" / self.image_name)
-        self.image = pg.transform.scale(image, self.image_size)
-        self.rect = self.image.get_rect(center=(int(self._pos[0]), int(self._pos[1])))
-
     def draw(self, screen: pg.Surface) -> None:
         """高速敵を画像で描画する。"""
         self.rect.center = (
@@ -95,10 +90,6 @@ class ShieldedEnemy(BaseEnemy):
         )
         self._shield: int = SHIELDED_ENEMY_SHIELD
         self._max_shield: int = SHIELDED_ENEMY_SHIELD
-
-        image = pg.image.load(Path("assets") / "fig" / self.image_name)
-        self.image = pg.transform.scale(image, self.image_size)
-        self.rect = self.image.get_rect(center=(int(self._pos[0]), int(self._pos[1])))
 
     def get_shield(self) -> int:
         """現在残っている盾 HP を返す。"""

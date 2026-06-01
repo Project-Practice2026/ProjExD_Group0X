@@ -7,7 +7,6 @@
 from __future__ import annotations
 
 import math
-from pathlib import Path
 
 import pygame as pg
 
@@ -72,10 +71,6 @@ class BossEnemy(BaseEnemy):
         )
         self._special_timer: float = BOSS_SPECIAL_INTERVAL
         self._death_announced: bool = False
-
-        image = pg.image.load(Path("assets") / "fig" / self.image_name)
-        self.image = pg.transform.scale(image, self.image_size)
-        self.rect = self.image.get_rect(center=(int(self._pos[0]), int(self._pos[1])))
 
     def get_special_timer(self) -> float:
         """次の特殊範囲攻撃までの残り秒数を返す。"""
