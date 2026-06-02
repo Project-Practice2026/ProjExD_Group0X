@@ -28,11 +28,14 @@ from core.constants import (
     SE_WAVE_START,
     VERSUS_FIELD_GAP,
     VERSUS_HINT_BOTTOM_MARGIN,
+    VERSUS_HINT_FONT_SIZE,
+    VERSUS_HUD_FONT_SIZE,
     VERSUS_HUD_MARGIN,
 )
 from core.fortress import Fortress
 from core.wave_manager import WaveManager
 from core.world import World, _NullSound
+from presentation import versus_mode
 from presentation.evolution_graph import EvolutionGraph, GenerationRecord
 from presentation.extended_hud import ExtendedHud
 from presentation.sound_manager import SoundManager
@@ -477,6 +480,34 @@ def test_versus_draw_renders_hud_for_both_sides() -> None:
     pg.quit()
 
 
+def test_versus_draw_reuses_cached_fonts() -> None:
+    """対戦 HUD のフォントをフレームごとに再生成しない。"""
+    pg.init()
+    screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    original_get_font = versus_mode.get_font
+    font_sizes: list[int] = []
+
+    def spy_get_font(size: int) -> pg.font.Font:
+        """生成されたフォントサイズを記録し、実フォントを返す。"""
+        font_sizes.append(size)
+        return original_get_font(size)
+
+    versus_mode.get_font = spy_get_font
+    try:
+        game = VersusGame(enemy_factory=BaseEnemy)
+        game.draw(screen)
+        game.draw(screen)
+        right_fortress = game.get_field("right").get_fortress()
+        right_fortress.take_damage(right_fortress.get_max_hp())
+        game.update(1.0 / 60.0)
+        game.draw(screen)
+
+        assert font_sizes == [VERSUS_HUD_FONT_SIZE, VERSUS_HINT_FONT_SIZE, 48]
+    finally:
+        versus_mode.get_font = original_get_font
+        pg.quit()
+
+
 def test_versus_handle_events_space_sends_enemy_from_left() -> None:
     """SPACE で左フィールドから右へ敵が送信される。"""
     pg.init()
@@ -577,6 +608,8 @@ if __name__ == "__main__":
     test_wave_manager_plays_wave_start()
     test_boss_death_effect_plays_se()
     test_world_uses_boss_death_hook_without_generic_enemy_die()
+    test_versus_draw_renders_hud_for_both_sides()
+    test_versus_draw_reuses_cached_fonts()
     test_versus_handle_events_space_sends_enemy_from_left()
     test_versus_handle_events_return_sends_enemy_from_right()
     test_versus_handle_events_escape_stops_running()

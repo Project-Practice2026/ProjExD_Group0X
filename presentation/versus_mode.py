@@ -172,6 +172,9 @@ class VersusGame:
         self._local_side: str = local_side
         self._enemy_factory: EnemyFactory | None = enemy_factory
         self._running: bool = False
+        self._hud_font: pg.font.Font = self._load_font(VERSUS_HUD_FONT_SIZE)
+        self._hint_font: pg.font.Font = self._load_font(VERSUS_HINT_FONT_SIZE)
+        self._result_font: pg.font.Font = self._load_font(48)
         # 拠点座標を左右に対称配置
         left_spawn = [
             (SCREEN_WIDTH * 0.20, SCREEN_HEIGHT * 0.30),
@@ -227,6 +230,13 @@ class VersusGame:
     def get_local_side(self) -> str:
         """Local_side を返す。"""
         return self._local_side
+
+    @staticmethod
+    def _load_font(size: int) -> pg.font.Font:
+        """対戦モードの生存期間で使い回すフォントを生成する。"""
+        if not pg.font.get_init():
+            pg.font.init()
+        return get_font(size)
 
     def is_finished(self) -> bool:
         """Finished かどうかを返す。"""
@@ -356,7 +366,6 @@ class VersusGame:
         field = self.get_field(side)
         fortress = field.get_fortress()
         wave_manager = field.get_wave_manager()
-        font = get_font(VERSUS_HUD_FONT_SIZE)
 
         bar_x = left_origin_x + VERSUS_HUD_MARGIN
         bar_y = VERSUS_HUD_MARGIN
@@ -384,7 +393,7 @@ class VersusGame:
         ]
         text_y = bar_y + VERSUS_HUD_HP_BAR_HEIGHT + 4
         for line in text_lines:
-            surface = font.render(line, True, COLOR_TEXT)
+            surface = self._hud_font.render(line, True, COLOR_TEXT)
             screen.blit(surface, (bar_x, text_y))
             text_y += VERSUS_HUD_LINE_HEIGHT
 
@@ -394,8 +403,7 @@ class VersusGame:
         中央セパレータ（白）がテキスト中央を縦に貫いて可読性を損なうため、
         テキスト背後に背景色の帯を敷いてから文字を描画する。
         """
-        font = get_font(VERSUS_HINT_FONT_SIZE)
-        surface = font.render(VERSUS_HINT_TEXT, True, COLOR_TEXT)
+        surface = self._hint_font.render(VERSUS_HINT_TEXT, True, COLOR_TEXT)
         rect = surface.get_rect(
             midbottom=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - VERSUS_HINT_BOTTOM_MARGIN),
         )
@@ -404,10 +412,7 @@ class VersusGame:
         screen.blit(surface, rect)
 
     def _draw_result(self, screen: pg.Surface) -> None:
-        if not pg.font.get_init():
-            pg.font.init()
-        font = get_font(48)
-        text = font.render(f"勝者: {self._winner.upper()}", True, COLOR_TEXT)
+        text = self._result_font.render(f"勝者: {self._winner.upper()}", True, COLOR_TEXT)
         rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
         bg_rect = rect.inflate(40, 24)
         pg.draw.rect(screen, (0, 0, 0), bg_rect)
