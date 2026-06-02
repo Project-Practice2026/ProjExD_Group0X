@@ -28,12 +28,17 @@ from .constants import (
     CLIENT_DEFAULT_PLAYER_RADIUS,
     CLIENT_DEFAULT_TOWER_RADIUS,
     CLIENT_FONT_SIZE,
+    CLIENT_FORTRESS_IMAGE,
+    CLIENT_FORTRESS_IMAGE_SIZE,
     CLIENT_HP_BAR_HEIGHT,
     CLIENT_HP_BAR_WIDTH,
     CLIENT_OVERLAY_TEXT_X_GAP,
     CLIENT_OVERLAY_TEXT_Y_OFFSET,
     CLIENT_OVERLAY_X,
     CLIENT_OVERLAY_Y,
+    CLIENT_SELF_RING_COLOR,
+    CLIENT_SELF_RING_PADDING,
+    CLIENT_SELF_RING_WIDTH,
     CLIENT_WAIT_FPS,
     CLIENT_WAITING_TEXT_Y_OFFSET,
     COLOR_BG,
@@ -50,12 +55,25 @@ from .constants import (
     FORTRESS_Y_RATIO,
     NET_CONNECT_TIMEOUT_SEC,
     NET_INPUT_HZ,
+    PLAYER_BUILDER_ID,
+    PLAYER_FIGHTER_ID,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
     SERVER_HOST,
     SERVER_PORT,
 )
 from .game import Game
+from .image_cache import load_scaled_image
+
+# ホストが state に image/size を載せてこない（旧バージョンのホスト等）場合に
+# クライアント側で使う既定スプライト。プレイヤーは ID から建築役/前線役を補完する。
+_PLAYER_SPRITES: dict[int, tuple[str, tuple[int, int]]] = {
+    PLAYER_BUILDER_ID: ("player_builder.png", (32, 32)),
+    PLAYER_FIGHTER_ID: ("player_fighter.png", (32, 32)),
+}
+_DEFAULT_PLAYER_SPRITE: tuple[str, tuple[int, int]] = ("player_fighter.png", (32, 32))
+_DEFAULT_TOWER_SPRITE: tuple[str, tuple[int, int]] = ("tower_physical.png", (48, 48))
+_DEFAULT_ENEMY_SPRITE: tuple[str, tuple[int, int]] = ("enemy.png", (32, 32))
 
 
 class ClientGame(Game):
@@ -183,60 +201,111 @@ class ClientGame(Game):
             "move": [float(dx), float(dy)],
             "attack": bool(keys[pg.K_j]),
             "skill": bool(keys[pg.K_k]),
+            # Enter で建築役の現在位置にタワーを設置（ホスト側で押下の立ち上がりを検出）。
+            "place": bool(keys[pg.K_RETURN] or keys[pg.K_KP_ENTER]),
         }
         self._client.send_input(payload)
 
     # ----- draw helpers -----
 
+    def _blit_sprite(self, entity: dict[str, Any], pos: tuple[float, float]) -> bool:
+        """受信した `image` / `size` からスプライトを中央揃えで描く。
+
+        画像名・サイズが無い／読み込めない場合は False を返し、呼び出し側で
+        円のプレースホルダーにフォールバックさせる。
+        """
+        name = entity.get("image")
+        size = entity.get("size")
+        if not isinstance(name, str) or not isinstance(size, (list, tuple)) or len(size) < 2:
+            return False
+        try:
+            image = load_scaled_image(name, (int(size[0]), int(size[1])))
+        except (pg.error, OSError, ValueError):
+            return False
+        self._screen.blit(image, image.get_rect(center=(int(pos[0]), int(pos[1]))))
+        return True
+
+    def _blit_with_default(
+        self,
+        entity: dict[str, Any],
+        pos: tuple[float, float],
+        default_image: str,
+        default_size: tuple[int, int],
+    ) -> bool:
+        """受信 image/size で描く。無ければ既定スプライトで描く。両方失敗で False。"""
+        if self._blit_sprite(entity, pos):
+            return True
+        return self._blit_sprite({"image": default_image, "size": list(default_size)}, pos)
+
     def _draw_fortress(self, state: dict[str, Any]) -> None:
-        """ホスト側の拠点と同じ右側中央位置へプレースホルダーを描く。"""
+        """ホスト側の拠点と同じ右側中央位置へ拠点スプライトを描く。"""
         _ = state  # state は将来 fortress 座標を含めた時の予約
         fortress_pos = (SCREEN_WIDTH * FORTRESS_X_RATIO, SCREEN_HEIGHT * FORTRESS_Y_RATIO)
-        pg.draw.circle(
-            self._screen,
-            COLOR_FORTRESS,
-            (int(fortress_pos[0]), int(fortress_pos[1])),
-            CLIENT_DEFAULT_FORTRESS_RADIUS,
-        )
+        center = (int(fortress_pos[0]), int(fortress_pos[1]))
+        try:
+            image = load_scaled_image(CLIENT_FORTRESS_IMAGE, CLIENT_FORTRESS_IMAGE_SIZE)
+        except (pg.error, OSError, ValueError):
+            pg.draw.circle(self._screen, COLOR_FORTRESS, center, CLIENT_DEFAULT_FORTRESS_RADIUS)
+            return
+        self._screen.blit(image, image.get_rect(center=center))
 
     def _draw_towers(self, state: dict[str, Any]) -> None:
-        """State 内のタワー一覧を小さな円で描く。"""
+        """State 内のタワー一覧をスプライト（無ければ円）で描く。"""
         for tower in state.get("towers", []):
             if not isinstance(tower, dict):
                 continue
             pos = tower.get("pos") or [0, 0]
-            pg.draw.circle(
-                self._screen,
-                COLOR_TOWER,
-                (int(pos[0]), int(pos[1])),
-                CLIENT_DEFAULT_TOWER_RADIUS,
-            )
+            if not self._blit_with_default(tower, pos, *_DEFAULT_TOWER_SPRITE):
+                pg.draw.circle(
+                    self._screen,
+                    COLOR_TOWER,
+                    (int(pos[0]), int(pos[1])),
+                    CLIENT_DEFAULT_TOWER_RADIUS,
+                )
 
     def _draw_enemies(self, state: dict[str, Any]) -> None:
-        """State 内の敵一覧を補間済み座標へ描く。"""
+        """State 内の敵一覧を補間済み座標へスプライト（無ければ円）で描く。"""
         for enemy in state.get("enemies", []):
             if not isinstance(enemy, dict):
                 continue
             pos = enemy.get("pos") or [0, 0]
-            pg.draw.circle(
-                self._screen,
-                COLOR_ENEMY,
-                (int(pos[0]), int(pos[1])),
-                CLIENT_DEFAULT_ENEMY_RADIUS,
-            )
+            if not self._blit_with_default(enemy, pos, *_DEFAULT_ENEMY_SPRITE):
+                pg.draw.circle(
+                    self._screen,
+                    COLOR_ENEMY,
+                    (int(pos[0]), int(pos[1])),
+                    CLIENT_DEFAULT_ENEMY_RADIUS,
+                )
 
     def _draw_players(self, state: dict[str, Any]) -> None:
-        """State 内のプレイヤー一覧を描く。"""
+        """State 内のプレイヤーをスプライトで描き、自分の操作キャラ（建築役）を強調する。"""
+        # クライアントは建築役（左下のキャラ）を操作するため、その ID を強調対象にする。
+        controlled_id = PLAYER_BUILDER_ID
         for player in state.get("players", []):
             if not isinstance(player, dict):
                 continue
             pos = player.get("pos") or [0, 0]
-            pg.draw.circle(
-                self._screen,
-                COLOR_PLAYER,
-                (int(pos[0]), int(pos[1])),
-                CLIENT_DEFAULT_PLAYER_RADIUS,
+            center = (int(pos[0]), int(pos[1]))
+            default_image, default_size = _PLAYER_SPRITES.get(
+                player.get("id"), _DEFAULT_PLAYER_SPRITE
             )
+            if not self._blit_with_default(player, pos, default_image, default_size):
+                pg.draw.circle(self._screen, COLOR_PLAYER, center, CLIENT_DEFAULT_PLAYER_RADIUS)
+            # 自分が操作するキャラには囲みリングを描いて分かりやすくする。
+            if player.get("id") == controlled_id:
+                size = player.get("size")
+                half = (
+                    int(size[1]) // 2
+                    if isinstance(size, (list, tuple)) and len(size) >= 2
+                    else (CLIENT_DEFAULT_PLAYER_RADIUS)
+                )
+                pg.draw.circle(
+                    self._screen,
+                    CLIENT_SELF_RING_COLOR,
+                    center,
+                    half + CLIENT_SELF_RING_PADDING,
+                    width=CLIENT_SELF_RING_WIDTH,
+                )
 
     def _draw_bullets(self, state: dict[str, Any]) -> None:
         """State 内の弾一覧を描く。"""

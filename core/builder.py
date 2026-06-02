@@ -88,6 +88,8 @@ class Builder(BasePlayer):
                 self._selected_tower_type = self.TOWER_TYPE_KEYS[event.key]
             elif event.key == pg.K_SPACE:
                 self._wave_skip_requested = True
+            elif event.key in (pg.K_RETURN, pg.K_KP_ENTER):
+                self.place_tower_at_self(world)
 
     def consume_wave_skip(self) -> bool:
         """ウェーブ早期開始リクエストを取り出して消費する。"""
@@ -97,6 +99,14 @@ class Builder(BasePlayer):
         return True
 
     # ----- internal helpers -----
+
+    def place_tower_at_self(self, world: World) -> bool:
+        """建築役の現在位置にタワーを設置する（Enter 操作・クライアント操作用）。
+
+        Returns:
+            設置できたら True（資源不足・設置不可なら False）。
+        """
+        return self._try_place_tower(world, (int(self._pos[0]), int(self._pos[1])))
 
     def _try_place_tower(self, world: World, pos: tuple[int, int]) -> bool:
         fpos = (float(pos[0]), float(pos[1]))
@@ -130,8 +140,12 @@ class Builder(BasePlayer):
     # ----- per-frame -----
 
     def update(self, input_state: dict) -> None:
-        """建築役は基本的に移動しない。インタフェース整合のための no-op。"""
-        _ = input_state
+        """移動入力(dx/dy)で移動する。
+
+        LAN 協力ではクライアントがこの建築役（画面左下のキャラ）を操作して動かす。
+        移動量の計算・画面内クランプは BasePlayer.update に委譲する。
+        """
+        super().update(input_state)
 
     def draw(self, screen: pg.Surface) -> None:
         """Surface に描画する。"""
