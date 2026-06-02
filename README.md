@@ -27,16 +27,17 @@ pip install -r requirements.txt
 
 ### 起動方法
 
+以下の手順で仮想環境を作成し、依存関係をインストールしてからゲームを起動します。
+
 ```bash
-# ホスト（プレイヤー1）として起動
-python main.py --host
+python3 -m venv .venv
+# Linux/macOS
+source .venv/bin/activate
+# Windows
+.venv\Scripts\activate
 
-# クライアント（プレイヤー2）として起動
-python main.py --client --ip=192.168.1.10
-
-# 1人プレイ（フォールバック・デバッグ用）
-python main.py --solo
-
+pip install -r requirements.txt
+python main.py
 ```
 
 ## CI・品質チェック
