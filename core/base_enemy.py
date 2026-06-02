@@ -7,12 +7,25 @@ EvolvedEnemy（担当①）、BossEnemy / SpecialEnemy（担当④）が継承�
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
 import pygame as pg
 
-from .constants import ENEMY_BASE_DAMAGE, ENEMY_BASE_HP, ENEMY_BASE_REWARD
+from .constants import (
+    ENEMY_BASE_DAMAGE,
+    ENEMY_BASE_HP,
+    ENEMY_BASE_REWARD,
+    TOWER_CONTACT_DAMAGE,
+    TOWER_CONTACT_DISTANCE,
+    TOWER_CONTACT_INTERVAL,
+)
 from .fortress import Fortress
 from .image_cache import load_scaled_image
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from .base_tower import BaseTower
 
 
 class BaseEnemy:
@@ -43,6 +56,9 @@ class BaseEnemy:
         # 速度低下バフ（担当③の氷タワー等で利用）
         self._speed_factor: float = 1.0
         self._slow_remaining: float = 0.0
+        # タワーへの体当たりダメージ用クールダウン（id(tower) -> 残り秒数）。
+        # 接触し続けても TOWER_CONTACT_INTERVAL ごとに 1 回だけダメージを与える。
+        self._tower_contact_cd: dict[int, float] = {}
 
         self.image: pg.Surface = load_scaled_image(self.image_name, self.image_size)
         self.rect: pg.Rect = self.image.get_rect(center=(int(self._pos[0]), int(self._pos[1])))
@@ -149,6 +165,34 @@ class BaseEnemy:
         """
         factor = max(0.0, float(factor))
         self._damage = max(1, round(self._damage * factor))
+
+    def collide_with_towers(self, towers: Sequence[BaseTower], dt: float = 1.0 / 60.0) -> None:
+        """接触中のタワーへ体当たりダメージを与える。
+
+        同じタワーへは TOWER_CONTACT_INTERVAL ごとに 1 回だけダメージを与えるため、
+        接触し続けても一気に削れない。約 10 回の体当たりでタワーは破壊される。
+        到達済み・撃破済みの敵はダメージを与えない。
+        """
+        # 進行中タワーのクールダウンを進める（接触が切れても残量は減らしておく）。
+        if self._tower_contact_cd:
+            self._tower_contact_cd = {
+                tid: remaining - dt
+                for tid, remaining in self._tower_contact_cd.items()
+                if remaining - dt > 0.0
+            }
+        if self._reached or self.is_dead():
+            return
+        x, y = self._pos
+        for tower in towers:
+            if tower.is_destroyed():
+                continue
+            tx, ty = tower.get_pos()
+            if math.hypot(tx - x, ty - y) > TOWER_CONTACT_DISTANCE:
+                continue
+            if self._tower_contact_cd.get(id(tower), 0.0) > 0.0:
+                continue
+            tower.take_damage(TOWER_CONTACT_DAMAGE)
+            self._tower_contact_cd[id(tower)] = TOWER_CONTACT_INTERVAL
 
     def update(self, fortress: Fortress, dt: float = 1.0 / 60.0) -> None:
         """拠点方向へ直進移動し、接触時にダメージを与える。"""
