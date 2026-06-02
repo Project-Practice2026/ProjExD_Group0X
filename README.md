@@ -27,16 +27,27 @@ pip install -r requirements.txt
 
 ### 起動方法
 
+以下の手順で仮想環境を作成し、依存関係をインストールしてからゲームを起動します。
+
 ```bash
-# ホスト（プレイヤー1）として起動
-python main.py --host
+# リポジトリのクローン
+git clone https://github.com/TomokiAkiyama06/ProjExD_Group09.git
 
-# クライアント（プレイヤー2）として起動
-python main.py --client --ip=192.168.1.10
+# ディレクトリの移動
+cd ProjExD_Group09
 
-# 1人プレイ（フォールバック・デバッグ用）
-python main.py --solo
+# 仮想環境の作成と有効化
+python3 -m venv .venv
+## Linux/macOS
+source .venv/bin/activate
+## Windows
+.venv\Scripts\activate
 
+# ライブラリのインストール
+pip install -r requirements.txt
+
+# ゲームの起動
+python main.py
 ```
 
 ## CI・品質チェック
