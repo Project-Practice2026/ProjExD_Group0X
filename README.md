@@ -30,6 +30,12 @@ pip install -r requirements.txt
 以下の手順で仮想環境を作成し、依存関係をインストールしてからゲームを起動します。
 
 ```bash
+# リポジトリのクローン
+git clone https://github.com/TomokiAkiyama06/ProjExD_Group09.git
+
+# ディレクトリの移動
+cd ProjExD_Group09
+
 python3 -m venv .venv
 # Linux/macOS
 source .venv/bin/activate
