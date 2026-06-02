@@ -216,6 +216,30 @@ def test_early_generation_falls_back_to_nn_when_no_towers() -> None:
     assert brain.last_input is not None, "タワーなし時はNNにフォールバックするはず"
 
 
+def test_early_generation_targets_fortress_when_near_all_towers() -> None:
+    """早期世代でも全タワーに到達済みなら拠点方向へ進むことを確認する（Issue #155）。
+
+    タワー位置と完全に重なる位置にいる敵は、これまで方向ベクトルが (0,0) になって
+    停滞していた。修正後はタワーを誘導対象から除外し、拠点方向へフォールバックする。
+    """
+    brain = _FixedBrain((0.0, 0.0))  # NN出力が呼ばれた場合の検知用
+    enemy = EvolvedEnemy(
+        pos=(200.0, 100.0),  # タワーと同座標
+        brain=brain,
+        speed=60.0,
+        generation=0,
+    )
+    tower = BaseTower(pos=(200.0, 100.0))
+    fortress = Fortress(pos=(900.0, 100.0))
+
+    enemy.update_with_towers(fortress, [tower], dt=0.5)
+
+    ex, ey = enemy.get_pos()
+    assert ex > 200.0, "拠点方向（+x）へ移動しているはず"
+    assert abs(ey - 100.0) < 1e-9, "拠点と同じ y にあるので y は変わらないはず"
+    assert brain.last_input is None, "早期世代ではNNを呼ばずに拠点へ向かうべき"
+
+
 def test_later_generation_uses_nn_even_with_towers() -> None:
     """閾値を超えた世代はタワーがあってもNNを使うことを確認する。"""
     brain = _FixedBrain((0.0, 1.0))  # 真下に移動するNN出力
