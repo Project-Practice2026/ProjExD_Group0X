@@ -270,6 +270,15 @@ VERSUS_FIELD_GAP: int = 16  # 2フィールド間の余白
 VERSUS_SEND_COST: int = 25  # 敵送信のリソース消費
 VERSUS_SEND_KEY_PROMPT: str = "B"  # 敵送信メニューを開くキー（表示用）
 VERSUS_MAX_WAVE: int = 99  # 対戦中は時間制限なし扱い
+# 対戦モード HUD（左右の各盤面の上部に拠点HP/資源/ウェーブを表示する）
+VERSUS_HUD_MARGIN: int = 10  # 画面端からの内側マージン
+VERSUS_HUD_LINE_HEIGHT: int = 22  # HUD テキストの行送り
+VERSUS_HUD_FONT_SIZE: int = 18  # HUD 本文フォントサイズ
+VERSUS_HUD_HP_BAR_WIDTH: int = 200  # 拠点 HP バーの幅
+VERSUS_HUD_HP_BAR_HEIGHT: int = 12  # 拠点 HP バーの高さ
+VERSUS_HINT_FONT_SIZE: int = 16  # 画面下部の操作ヒント用フォントサイズ
+VERSUS_HINT_BOTTOM_MARGIN: int = 12  # 操作ヒントを画面下からどれだけ上に置くか
+VERSUS_HINT_TEXT: str = "SPACE: 左→右に送信   ENTER: 右→左に送信   ESC: 終了"
 
 # サウンド
 SOUND_ASSET_DIR: str = "assets/sound"  # SE/BGM の検索先
