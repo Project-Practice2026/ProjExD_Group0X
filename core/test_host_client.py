@@ -314,6 +314,21 @@ def test_client_blit_sprite_uses_image_and_falls_back() -> None:
         pg.quit()
 
 
+def test_client_blit_with_default_falls_back_to_sprite() -> None:
+    """image/size が無い（旧ホスト等）でも、既定スプライトで描画できる。"""
+    pg.init()
+    pg.display.set_mode((400, 200))
+    client = ClientGame(host="127.0.0.1", port=9, name="tester")
+    try:
+        # image 無しでも既定スプライト名が有効なら描画して True。
+        assert client._blit_with_default({}, (50.0, 50.0), "player_builder.png", (32, 32))
+        # 既定スプライト名も無効なら False（呼び出し側で円フォールバック）。
+        assert not client._blit_with_default({}, (0.0, 0.0), "does_not_exist.png", (10, 10))
+    finally:
+        client.stop()
+        pg.quit()
+
+
 if __name__ == "__main__":
     test_host_starts_and_binds_port()
     test_client_connects_to_host_and_receives_state()
@@ -326,4 +341,5 @@ if __name__ == "__main__":
     test_client_run_stops_net_client_on_connect_failure()
     test_state_players_include_sprite_fields()
     test_client_blit_sprite_uses_image_and_falls_back()
+    test_client_blit_with_default_falls_back_to_sprite()
     print("All host-client integration tests passed.")

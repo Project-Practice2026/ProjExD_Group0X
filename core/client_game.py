@@ -56,6 +56,7 @@ from .constants import (
     NET_CONNECT_TIMEOUT_SEC,
     NET_INPUT_HZ,
     PLAYER_BUILDER_ID,
+    PLAYER_FIGHTER_ID,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
     SERVER_HOST,
@@ -63,6 +64,16 @@ from .constants import (
 )
 from .game import Game
 from .image_cache import load_scaled_image
+
+# ホストが state に image/size を載せてこない（旧バージョンのホスト等）場合に
+# クライアント側で使う既定スプライト。プレイヤーは ID から建築役/前線役を補完する。
+_PLAYER_SPRITES: dict[int, tuple[str, tuple[int, int]]] = {
+    PLAYER_BUILDER_ID: ("player_builder.png", (32, 32)),
+    PLAYER_FIGHTER_ID: ("player_fighter.png", (32, 32)),
+}
+_DEFAULT_PLAYER_SPRITE: tuple[str, tuple[int, int]] = ("player_fighter.png", (32, 32))
+_DEFAULT_TOWER_SPRITE: tuple[str, tuple[int, int]] = ("tower_physical.png", (48, 48))
+_DEFAULT_ENEMY_SPRITE: tuple[str, tuple[int, int]] = ("enemy.png", (32, 32))
 
 
 class ClientGame(Game):
@@ -214,6 +225,18 @@ class ClientGame(Game):
         self._screen.blit(image, image.get_rect(center=(int(pos[0]), int(pos[1]))))
         return True
 
+    def _blit_with_default(
+        self,
+        entity: dict[str, Any],
+        pos: tuple[float, float],
+        default_image: str,
+        default_size: tuple[int, int],
+    ) -> bool:
+        """受信 image/size で描く。無ければ既定スプライトで描く。両方失敗で False。"""
+        if self._blit_sprite(entity, pos):
+            return True
+        return self._blit_sprite({"image": default_image, "size": list(default_size)}, pos)
+
     def _draw_fortress(self, state: dict[str, Any]) -> None:
         """ホスト側の拠点と同じ右側中央位置へ拠点スプライトを描く。"""
         _ = state  # state は将来 fortress 座標を含めた時の予約
@@ -232,7 +255,7 @@ class ClientGame(Game):
             if not isinstance(tower, dict):
                 continue
             pos = tower.get("pos") or [0, 0]
-            if not self._blit_sprite(tower, pos):
+            if not self._blit_with_default(tower, pos, *_DEFAULT_TOWER_SPRITE):
                 pg.draw.circle(
                     self._screen,
                     COLOR_TOWER,
@@ -246,7 +269,7 @@ class ClientGame(Game):
             if not isinstance(enemy, dict):
                 continue
             pos = enemy.get("pos") or [0, 0]
-            if not self._blit_sprite(enemy, pos):
+            if not self._blit_with_default(enemy, pos, *_DEFAULT_ENEMY_SPRITE):
                 pg.draw.circle(
                     self._screen,
                     COLOR_ENEMY,
@@ -263,7 +286,10 @@ class ClientGame(Game):
                 continue
             pos = player.get("pos") or [0, 0]
             center = (int(pos[0]), int(pos[1]))
-            if not self._blit_sprite(player, pos):
+            default_image, default_size = _PLAYER_SPRITES.get(
+                player.get("id"), _DEFAULT_PLAYER_SPRITE
+            )
+            if not self._blit_with_default(player, pos, default_image, default_size):
                 pg.draw.circle(self._screen, COLOR_PLAYER, center, CLIENT_DEFAULT_PLAYER_RADIUS)
             # 自分が操作するキャラには囲みリングを描いて分かりやすくする。
             if player.get("id") == controlled_id:
