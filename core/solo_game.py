@@ -19,6 +19,7 @@ from .constants import (
     BOSS_WAVE_CLEAR_FORTRESS_HEAL,
     BOSS_WAVE_CLEAR_GOLD_BONUS,
     BOSS_WAVE_MODULO,
+    COLOR_TEXT,
     EVOLUTION_GRAPH_DEFAULT_ORIGIN,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
@@ -26,6 +27,7 @@ from .constants import (
     WAVE_CLEAR_GOLD_BONUS,
 )
 from .fighter import Fighter
+from .fonts import get_font
 from .game import Game
 from .wave_manager import EnemyFactory, WaveManager, WavePhase
 from .world import EffectSink, SoundSink, World
@@ -98,6 +100,11 @@ class SoloGame(Game):
     """1台で両プレイヤーを操作するゲームモード。"""
 
     TUTORIAL_OPEN_KEYS: tuple[int, ...] = (pg.K_p, pg.K_F1)
+    # 画面下部に常時表示する操作ヒント（P でチュートリアルを開ける旨）
+    TUTORIAL_HINT_TEXT: str = "[P] チュートリアルを表示"
+    TUTORIAL_HINT_FONT_SIZE: int = 20
+    TUTORIAL_HINT_MARGIN_BOTTOM: int = 12
+    TUTORIAL_HINT_MARGIN_RIGHT: int = 12
 
     def __init__(  # noqa: PLR0913 - solo モードは合成層なので注入引数が増えやすい
         self,
@@ -145,6 +152,8 @@ class SoloGame(Game):
         )
         self._hud: BaseHud = BaseHud()
         self._hud.set_max_hp(self._world.get_fortress().get_max_hp())
+        # 画面下部の操作ヒント用フォント（日本語表示のため共通ローダを使う）
+        self._hint_font: pg.font.Font = get_font(self.TUTORIAL_HINT_FONT_SIZE)
         self._selector_ui: TowerSelector | None = tower_selector
         self._weapon_ui: WeaponSelector | None = weapon_selector
         self._evolution_graph: EvolutionGraphSink | None = evolution_graph
@@ -252,8 +261,23 @@ class SoloGame(Game):
                 self._weapon_ui.draw(self._screen, self._fighter, current_weapon)
         if self._evolution_graph is not None:
             self._evolution_graph.draw(self._screen, self._evolution_graph_origin)
+        # チュートリアルを開ける旨のヒントを画面下部に表示する。
+        # オーバーレイ表示中はオーバーレイ自身が説明を出すため重複表示を避ける。
+        if not self.is_tutorial_visible():
+            self._draw_tutorial_hint()
         if self._tutorial_overlay is not None:
             self._tutorial_overlay.draw(self._screen)
+
+    def _draw_tutorial_hint(self) -> None:
+        """画面右下に「P でチュートリアルを表示」のヒントを描画する。"""
+        surface = self._hint_font.render(self.TUTORIAL_HINT_TEXT, True, COLOR_TEXT)
+        rect = surface.get_rect(
+            bottomright=(
+                SCREEN_WIDTH - self.TUTORIAL_HINT_MARGIN_RIGHT,
+                SCREEN_HEIGHT - self.TUTORIAL_HINT_MARGIN_BOTTOM,
+            )
+        )
+        self._screen.blit(surface, rect)
 
     def is_tutorial_visible(self) -> bool:
         """操作説明オーバーレイが表示中なら True を返す。"""
