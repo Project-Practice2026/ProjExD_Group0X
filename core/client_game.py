@@ -55,6 +55,7 @@ from .constants import (
     FORTRESS_Y_RATIO,
     NET_CONNECT_TIMEOUT_SEC,
     NET_INPUT_HZ,
+    PLAYER_BUILDER_ID,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
     SERVER_HOST,
@@ -254,8 +255,9 @@ class ClientGame(Game):
                 )
 
     def _draw_players(self, state: dict[str, Any]) -> None:
-        """State 内のプレイヤーをスプライトで描き、自分の操作キャラを強調する。"""
-        own_id = self._client.get_player_id()
+        """State 内のプレイヤーをスプライトで描き、自分の操作キャラ（建築役）を強調する。"""
+        # クライアントは建築役（左下のキャラ）を操作するため、その ID を強調対象にする。
+        controlled_id = PLAYER_BUILDER_ID
         for player in state.get("players", []):
             if not isinstance(player, dict):
                 continue
@@ -264,7 +266,7 @@ class ClientGame(Game):
             if not self._blit_sprite(player, pos):
                 pg.draw.circle(self._screen, COLOR_PLAYER, center, CLIENT_DEFAULT_PLAYER_RADIUS)
             # 自分が操作するキャラには囲みリングを描いて分かりやすくする。
-            if own_id is not None and player.get("id") == own_id:
+            if player.get("id") == controlled_id:
                 size = player.get("size")
                 half = (
                     int(size[1]) // 2
