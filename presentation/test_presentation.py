@@ -14,6 +14,10 @@ from core.base_enemy import BaseEnemy
 from core.base_tower import BaseTower
 from core.builder import Builder
 from core.constants import (
+    COLOR_BG,
+    COLOR_HP_BAR_FG,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
     SE_BOSS_DIE,
     SE_DEFEAT,
     SE_ENEMY_DIE,
@@ -22,6 +26,9 @@ from core.constants import (
     SE_VERSUS_SEND,
     SE_VICTORY,
     SE_WAVE_START,
+    VERSUS_FIELD_GAP,
+    VERSUS_HINT_BOTTOM_MARGIN,
+    VERSUS_HUD_MARGIN,
 )
 from core.fortress import Fortress
 from core.wave_manager import WaveManager
@@ -435,6 +442,39 @@ def test_world_uses_boss_death_hook_without_generic_enemy_die() -> None:
 
 
 # ===== Versus 起動経路（Issue #93） =====
+
+
+def test_versus_draw_renders_hud_for_both_sides() -> None:
+    """対戦モードの draw が左右両サイドに HUD（拠点HPバー + 操作ヒント）を描く（Issue #157）。
+
+    pygame ヘッドレスで draw を呼び、HUD 想定位置のピクセルが BG 色ではない
+    （= 何かが描画されている）ことで描画されたことを確認する。
+    """
+    pg.init()
+    screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    game = VersusGame(enemy_factory=BaseEnemy)
+    game.start()
+    game.draw(screen)
+
+    half_width = (SCREEN_WIDTH - VERSUS_FIELD_GAP) // 2
+    # 左サイド HUD：HP バー上端のピクセルが FG 色（満タンなので fg_width > 0）
+    left_bar_px = screen.get_at((VERSUS_HUD_MARGIN + 4, VERSUS_HUD_MARGIN + 4))
+    assert tuple(left_bar_px)[:3] == COLOR_HP_BAR_FG, "左サイド拠点HPバーが描画されていない"
+
+    # 右サイド HUD：右盤面領域の左端マージン位置
+    right_origin = half_width + VERSUS_FIELD_GAP
+    right_bar_px = screen.get_at((right_origin + VERSUS_HUD_MARGIN + 4, VERSUS_HUD_MARGIN + 4))
+    assert tuple(right_bar_px)[:3] == COLOR_HP_BAR_FG, "右サイド拠点HPバーが描画されていない"
+
+    # 操作ヒント：画面下部中央に何かが描画されている（BG 以外のピクセルがある）
+    hint_y = SCREEN_HEIGHT - VERSUS_HINT_BOTTOM_MARGIN - 6
+    found_text = False
+    for x in range(SCREEN_WIDTH // 2 - 200, SCREEN_WIDTH // 2 + 200):
+        if tuple(screen.get_at((x, hint_y)))[:3] != COLOR_BG:
+            found_text = True
+            break
+    assert found_text, "画面下部中央に操作ヒントが描画されていない"
+    pg.quit()
 
 
 def test_versus_handle_events_space_sends_enemy_from_left() -> None:
