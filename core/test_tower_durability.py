@@ -69,8 +69,8 @@ def test_enemy_bump_respects_cooldown() -> None:
     assert tower.get_hp() == 8  # 間隔経過後に再びダメージ
 
 
-def test_about_ten_bumps_destroy_tower() -> None:
-    """約10回の体当たりでタワーが破壊される。"""
+def test_repeated_bumps_destroy_tower() -> None:
+    """TOWER_MAX_HP 回ほどの体当たりでタワーが破壊される。"""
     tower = BaseTower(pos=(100.0, 100.0), max_hp=TOWER_MAX_HP)
     enemy = BaseEnemy(pos=(100.0, 100.0), speed=0.0)
     for _ in range(TOWER_MAX_HP):
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     test_tower_take_damage_and_destroy()
     test_derived_tower_inherits_hp()
     test_enemy_bump_respects_cooldown()
-    test_about_ten_bumps_destroy_tower()
+    test_repeated_bumps_destroy_tower()
     test_enemy_out_of_range_does_not_damage_tower()
     test_dead_enemy_does_not_damage_tower()
     test_world_removes_destroyed_tower()

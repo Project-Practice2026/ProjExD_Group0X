@@ -60,6 +60,10 @@ class EvolvedEnemy(BaseEnemy):
         super().__init__(pos=pos, hp=hp, speed=speed, damage=damage, reward=reward)
         self._brain: NeuralNet = brain if brain is not None else NeuralNet()
         self._generation: int = generation
+        # 早期世代がロックオン中のタワー。破壊・除去されたら拠点へ切り替え、
+        # 以後はタワーを狙わない（_tower_target_destroyed が True のまま）。
+        self._target_tower: BaseTower | None = None
+        self._tower_target_destroyed: bool = False
 
     @property
     def brain(self) -> NeuralNet:
@@ -94,9 +98,10 @@ class EvolvedEnemy(BaseEnemy):
     ) -> None:
         """拠点と近傍タワーを観測し、移動方向を決定して移動する。
 
-        EARLY_GENERATION_THRESHOLD 以下の世代では最近傍タワーへ向かい、
-        それ以降の世代では NN の出力方向を使う。タワーが存在しない早期世代では
-        NN にフォールバックする。
+        EARLY_GENERATION_THRESHOLD 以下の世代では最近傍タワーをロックオンして向かい、
+        それ以降の世代では NN の出力方向を使う。ロックオン中のタワーが破壊・除去された
+        場合は、以後そのタワーを狙わず拠点へ向かう。一度もタワーを狙っていない早期世代で
+        タワーが存在しないときは NN にフォールバックする。
 
         Args:
             fortress: 目標となる拠点
@@ -109,8 +114,13 @@ class EvolvedEnemy(BaseEnemy):
         if self._handle_fortress_contact(fortress):
             return
 
-        if self._generation <= EARLY_GENERATION_THRESHOLD and towers:
-            vx, vy = self._direction_to_nearest_tower(towers)
+        # ロックオン中のタワーが破壊・除去されたかを先に判定する（towers が空に
+        # なってもこのフレームで拠点へ切り替えられるよう、分岐の前に行う）。
+        self._refresh_tower_target(towers)
+        if self._generation <= EARLY_GENERATION_THRESHOLD and (
+            towers or self._tower_target_destroyed
+        ):
+            vx, vy = self._guided_direction(fortress, towers)
         else:
             inputs = self._build_input_vector(fortress, towers)
             velocity = np.asarray(self.decide(inputs), dtype=float)
@@ -167,28 +177,52 @@ class EvolvedEnemy(BaseEnemy):
             return 0.0
         return self._clip(self._hp / self._max_hp, minimum=0.0, maximum=1.0)
 
-    def _direction_to_nearest_tower(
+    def _guided_direction(
         self,
+        fortress: Fortress,
         towers: Sequence[BaseTower],
     ) -> tuple[float, float]:
-        """最近傍タワーへの正規化方向ベクトルを返す。
+        """ロックオン中のタワーへ向かう方向を返す（破壊後は拠点へ）。
 
-        同距離のタワーが複数あるとき最初に見つかったものを使う。
-        タワーと完全に同座標の場合は (0.0, 0.0) を返す。
+        まだ狙うタワーが無ければ最近傍タワーをロックオンする。ロックオン中の
+        タワーが破壊（HP0）または除去された場合は、以後そのタワーを狙わず拠点へ
+        向かう（別タワーには切り替えない）。同座標で方向が定まらない場合は
+        (0.0, 0.0) を返す。
 
         Args:
-            towers: 対象タワー一覧（空でないこと）
+            fortress: タワー破壊後に向かう拠点
+            towers: 観測対象のタワー一覧
 
         Returns:
             長さ 1.0 の方向ベクトル (vx, vy)、または同座標なら (0.0, 0.0)
         """
-        nearest = min(towers, key=lambda t: self._distance_to(t.get_pos()))
-        tx, ty = nearest.get_pos()
+        if not self._tower_target_destroyed and self._target_tower is None and towers:
+            self._target_tower = min(towers, key=lambda t: self._distance_to(t.get_pos()))
+        if self._target_tower is not None:
+            return self._direction_to(self._target_tower.get_pos())
+        return self._direction_to(fortress.get_pos())
+
+    def _refresh_tower_target(self, towers: Sequence[BaseTower]) -> None:
+        """ロックオン中のタワーが破壊・除去されていたら、拠点へ切り替える。
+
+        一度破壊を検知したら以後は別タワーを狙わない（_tower_target_destroyed を
+        立てたままにする）。
+        """
+        if self._target_tower is not None and (
+            self._target_tower.is_destroyed() or self._target_tower not in towers
+        ):
+            self._target_tower = None
+            self._tower_target_destroyed = True
+
+    def _direction_to(self, pos: tuple[float, float]) -> tuple[float, float]:
+        """現在位置から指定座標への正規化方向ベクトルを返す（同座標なら原点）。"""
         x, y = self._pos
-        dist = math.hypot(tx - x, ty - y)
+        px, py = pos
+        dx, dy = px - x, py - y
+        dist = math.hypot(dx, dy)
         if dist == 0.0:
             return (0.0, 0.0)
-        return ((tx - x) / dist, (ty - y) / dist)
+        return (dx / dist, dy / dist)
 
     def _distance_to(self, pos: tuple[float, float]) -> float:
         """現在位置から指定座標までの距離を返す。"""

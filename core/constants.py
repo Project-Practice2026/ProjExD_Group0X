@@ -39,8 +39,8 @@ TOWER_BASE_COOLDOWN: float = 0.8
 BULLET_SPEED: float = 360.0
 
 # タワー耐久（敵の体当たり）。敵が TOWER_CONTACT_DAMAGE のダメージを与え、
-# TOWER_MAX_HP / TOWER_CONTACT_DAMAGE ≒ 10 回の体当たりでタワーは破壊される。
-TOWER_MAX_HP: int = 10
+# TOWER_MAX_HP / TOWER_CONTACT_DAMAGE ≒ 20 回の体当たりでタワーは破壊される。
+TOWER_MAX_HP: int = 20
 TOWER_CONTACT_DAMAGE: int = 1  # 敵 1 回の体当たりでタワーに入るダメージ
 TOWER_CONTACT_DISTANCE: float = 28.0  # 敵とタワーが接触したとみなす距離
 # 同じ敵が同じタワーへ連続でダメージを与えるまでの間隔（秒）。これがないと
