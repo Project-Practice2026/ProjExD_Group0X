@@ -20,6 +20,8 @@ try:
     from ..core.base_enemy import BaseEnemy
     from ..core.constants import (
         COLOR_BG,
+        COLOR_HP_BAR_BG,
+        COLOR_HP_BAR_FG,
         COLOR_TEXT,
         FPS,
         INITIAL_GOLD,
@@ -29,6 +31,14 @@ try:
         SE_VERSUS_SEND,
         SE_VICTORY,
         VERSUS_FIELD_GAP,
+        VERSUS_HINT_BOTTOM_MARGIN,
+        VERSUS_HINT_FONT_SIZE,
+        VERSUS_HINT_TEXT,
+        VERSUS_HUD_FONT_SIZE,
+        VERSUS_HUD_HP_BAR_HEIGHT,
+        VERSUS_HUD_HP_BAR_WIDTH,
+        VERSUS_HUD_LINE_HEIGHT,
+        VERSUS_HUD_MARGIN,
         VERSUS_MAX_WAVE,
         VERSUS_SEND_COST,
     )
@@ -40,6 +50,8 @@ except ImportError:
     from core.base_enemy import BaseEnemy
     from core.constants import (
         COLOR_BG,
+        COLOR_HP_BAR_BG,
+        COLOR_HP_BAR_FG,
         COLOR_TEXT,
         FPS,
         INITIAL_GOLD,
@@ -49,6 +61,14 @@ except ImportError:
         SE_VERSUS_SEND,
         SE_VICTORY,
         VERSUS_FIELD_GAP,
+        VERSUS_HINT_BOTTOM_MARGIN,
+        VERSUS_HINT_FONT_SIZE,
+        VERSUS_HINT_TEXT,
+        VERSUS_HUD_FONT_SIZE,
+        VERSUS_HUD_HP_BAR_HEIGHT,
+        VERSUS_HUD_HP_BAR_WIDTH,
+        VERSUS_HUD_LINE_HEIGHT,
+        VERSUS_HUD_MARGIN,
         VERSUS_MAX_WAVE,
         VERSUS_SEND_COST,
     )
@@ -152,6 +172,9 @@ class VersusGame:
         self._local_side: str = local_side
         self._enemy_factory: EnemyFactory | None = enemy_factory
         self._running: bool = False
+        self._hud_font: pg.font.Font = self._load_font(VERSUS_HUD_FONT_SIZE)
+        self._hint_font: pg.font.Font = self._load_font(VERSUS_HINT_FONT_SIZE)
+        self._result_font: pg.font.Font = self._load_font(48)
         # 拠点座標を左右に対称配置
         left_spawn = [
             (SCREEN_WIDTH * 0.20, SCREEN_HEIGHT * 0.30),
@@ -207,6 +230,13 @@ class VersusGame:
     def get_local_side(self) -> str:
         """Local_side を返す。"""
         return self._local_side
+
+    @staticmethod
+    def _load_font(size: int) -> pg.font.Font:
+        """対戦モードの生存期間で使い回すフォントを生成する。"""
+        if not pg.font.get_init():
+            pg.font.init()
+        return get_font(size)
 
     def is_finished(self) -> bool:
         """Finished かどうかを返す。"""
@@ -305,15 +335,84 @@ class VersusGame:
                 SCREEN_HEIGHT,
             ),
         )
+        # 左右の HUD と操作ヒントを描画
+        self._draw_side_hud(screen, "left", left_origin_x=0)
+        self._draw_side_hud(
+            screen,
+            "right",
+            left_origin_x=half_width + VERSUS_FIELD_GAP,
+        )
+        self._draw_hint(screen)
         # 勝敗テキスト
         if self._winner is not None:
             self._draw_result(screen)
 
+    def _draw_side_hud(
+        self,
+        screen: pg.Surface,
+        side: str,
+        left_origin_x: int,
+    ) -> None:
+        """指定サイドの HUD（拠点 HP / 資源 / ウェーブ）を上部に描画する。
+
+        左サイドは盤面の左寄せ、右サイドも視認性のため左寄せに統一する
+        （右サイドの左端 = 中央セパレータの右隣 = ``left_origin_x``）。
+
+        Args:
+            screen: 描画対象のスクリーン。
+            side: ``"left"`` または ``"right"``。
+            left_origin_x: そのサイドが画面上で占める領域の左端 x 座標。
+        """
+        field = self.get_field(side)
+        fortress = field.get_fortress()
+        wave_manager = field.get_wave_manager()
+
+        bar_x = left_origin_x + VERSUS_HUD_MARGIN
+        bar_y = VERSUS_HUD_MARGIN
+        # 拠点 HP バー
+        pg.draw.rect(
+            screen,
+            COLOR_HP_BAR_BG,
+            (bar_x, bar_y, VERSUS_HUD_HP_BAR_WIDTH, VERSUS_HUD_HP_BAR_HEIGHT),
+        )
+        max_hp = max(1, fortress.get_max_hp())
+        ratio = max(0.0, min(1.0, fortress.get_hp() / max_hp))
+        fg_width = int(VERSUS_HUD_HP_BAR_WIDTH * ratio)
+        if fg_width > 0:
+            pg.draw.rect(
+                screen,
+                COLOR_HP_BAR_FG,
+                (bar_x, bar_y, fg_width, VERSUS_HUD_HP_BAR_HEIGHT),
+            )
+
+        # テキスト 3 行：拠点 HP / リソース / ウェーブ
+        text_lines: list[str] = [
+            f"{side.upper()} 拠点 HP {fortress.get_hp()}/{max_hp}",
+            f"リソース: {field.get_gold()}  (送信コスト {self._send_cost})",
+            f"ウェーブ: {wave_manager.get_wave()}",
+        ]
+        text_y = bar_y + VERSUS_HUD_HP_BAR_HEIGHT + 4
+        for line in text_lines:
+            surface = self._hud_font.render(line, True, COLOR_TEXT)
+            screen.blit(surface, (bar_x, text_y))
+            text_y += VERSUS_HUD_LINE_HEIGHT
+
+    def _draw_hint(self, screen: pg.Surface) -> None:
+        """画面下部中央に操作ヒントを 1 行描画する。
+
+        中央セパレータ（白）がテキスト中央を縦に貫いて可読性を損なうため、
+        テキスト背後に背景色の帯を敷いてから文字を描画する。
+        """
+        surface = self._hint_font.render(VERSUS_HINT_TEXT, True, COLOR_TEXT)
+        rect = surface.get_rect(
+            midbottom=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - VERSUS_HINT_BOTTOM_MARGIN),
+        )
+        background_rect = rect.inflate(16, 6)
+        pg.draw.rect(screen, COLOR_BG, background_rect)
+        screen.blit(surface, rect)
+
     def _draw_result(self, screen: pg.Surface) -> None:
-        if not pg.font.get_init():
-            pg.font.init()
-        font = get_font(48)
-        text = font.render(f"勝者: {self._winner.upper()}", True, COLOR_TEXT)
+        text = self._result_font.render(f"勝者: {self._winner.upper()}", True, COLOR_TEXT)
         rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
         bg_rect = rect.inflate(40, 24)
         pg.draw.rect(screen, (0, 0, 0), bg_rect)
