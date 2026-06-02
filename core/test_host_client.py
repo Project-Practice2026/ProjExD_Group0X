@@ -216,6 +216,52 @@ def test_client_run_stops_net_client_on_connect_failure() -> None:
     assert not client.is_running()
 
 
+def test_state_players_include_sprite_fields() -> None:
+    """送信 state のプレイヤーに画像名・サイズが含まれ、クライアントが描画できる。"""
+    pg.init()
+    pg.display.set_mode((400, 200))
+    host = HostGame(host="127.0.0.1", port=0)
+    host.start_network()
+    bound = host.get_bound_address()
+    assert bound is not None
+    host_ip, host_port = bound
+
+    client = ClientGame(host=host_ip, port=host_port, name="tester")
+    try:
+        assert client.connect(timeout=2.0)
+        for _ in range(20):
+            _drive_host_one_frame(host)
+        assert _wait_until(lambda: client.get_client().poll_state() is not None)
+        latest = client.get_client().poll_state()
+        assert latest is not None
+        players = latest.get("players", [])
+        assert players, "state にプレイヤーが含まれるはず"
+        for player in players:
+            assert isinstance(player.get("image"), str) and player["image"]
+            size = player.get("size")
+            assert isinstance(size, list) and len(size) == 2
+    finally:
+        client.stop()
+        host.stop_network()
+        pg.quit()
+
+
+def test_client_blit_sprite_uses_image_and_falls_back() -> None:
+    """`_blit_sprite` は image/size があれば描画し、無ければ False を返す。"""
+    pg.init()
+    pg.display.set_mode((400, 200))
+    client = ClientGame(host="127.0.0.1", port=9, name="tester")
+    try:
+        # 正常な image/size はスプライトを描いて True。
+        assert client._blit_sprite({"image": "player_fighter.png", "size": [32, 32]}, (50.0, 50.0))
+        # image/size が無い場合は False（呼び出し側で円フォールバック）。
+        assert not client._blit_sprite({}, (0.0, 0.0))
+        assert not client._blit_sprite({"image": "player_fighter.png"}, (0.0, 0.0))
+    finally:
+        client.stop()
+        pg.quit()
+
+
 if __name__ == "__main__":
     test_host_starts_and_binds_port()
     test_client_connects_to_host_and_receives_state()
@@ -224,4 +270,6 @@ if __name__ == "__main__":
     test_host_ignores_malformed_remote_move_payloads()
     test_host_broadcasts_state_at_configured_hz()
     test_client_run_stops_net_client_on_connect_failure()
+    test_state_players_include_sprite_fields()
+    test_client_blit_sprite_uses_image_and_falls_back()
     print("All host-client integration tests passed.")

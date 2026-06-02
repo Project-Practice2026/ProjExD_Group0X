@@ -168,6 +168,9 @@ class HostGame(SoloGame):
                 "id": id(enemy),
                 "pos": list(enemy.get_pos()),
                 "hp": enemy.get_hp(),
+                # クライアントが同じスプライトで描けるよう画像名とサイズも送る。
+                "image": enemy.image_name,
+                "size": list(enemy.image_size),
             }
             for enemy in world.get_enemies()
         ]
@@ -177,6 +180,8 @@ class HostGame(SoloGame):
                 "pos": list(tower.get_pos()),
                 "damage": tower.get_damage(),
                 "range": tower.get_range(),
+                "image": tower.image_name,
+                "size": list(tower.image_size),
             }
             for tower in world.get_towers()
         ]
@@ -185,6 +190,8 @@ class HostGame(SoloGame):
                 "id": player.get_player_id(),
                 "pos": list(player.get_pos()),
                 "hp": player.get_hp(),
+                "image": player.image_name,
+                "size": list(player.image_size),
             }
             for player in world.get_players()
         ]
