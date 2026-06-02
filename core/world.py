@@ -259,6 +259,14 @@ class World:
 
     # ----- per-frame -----
 
+    def _resolve_tower_collisions(self, dt: float) -> None:
+        """敵の体当たりでタワーの HP を削り、破壊されたタワーを取り除く。"""
+        for enemy in self._enemies:
+            collide = getattr(enemy, "collide_with_towers", None)
+            if callable(collide):
+                collide(self._towers, dt)
+        self._towers = [t for t in self._towers if not t.is_destroyed()]
+
     def update(self, dt: float) -> None:
         """エンティティを 1 フレーム分進める。"""
         for player in self._players:
@@ -275,6 +283,8 @@ class World:
                 update_with_towers(self._fortress, self._towers, dt)
             else:
                 enemy.update(self._fortress, dt)
+        # 敵の体当たりでタワーの HP を削り、破壊されたタワーを取り除く。
+        self._resolve_tower_collisions(dt)
         # 撃破・到達した敵を弾く前に撃破位置のエフェクト＋SE を焚く
         for dead in (e for e in self._enemies if e.is_dead()):
             death_hook = getattr(dead, "trigger_death_effect", None)

@@ -614,3 +614,47 @@ def test_enemy_hp_increases_with_generation() -> None:
     gen2_hp = driver.spawn_enemy((100.0, 100.0)).get_max_hp()
     assert gen2_hp > gen1_hp
     assert gen2_hp == round(ENEMY_BASE_HP * (1.0 + ENEMY_HP_GROWTH_PER_GENERATION))
+
+
+def test_redirects_to_fortress_after_target_tower_destroyed() -> None:
+    """ロックオン中のタワーが破壊されたら、以後は拠点へ向かう。"""
+    brain = _FixedBrain((0.0, 0.0))  # NN出力は原点（呼ばれないはず）
+    enemy = EvolvedEnemy(
+        pos=(100.0, 300.0),
+        brain=brain,
+        speed=60.0,
+        generation=EARLY_GENERATION_THRESHOLD,
+    )
+    tower = BaseTower(pos=(100.0, 100.0))  # 真上にタワー（-y方向）
+    fortress = Fortress(pos=(100.0, 900.0))  # 真下に拠点（+y方向）
+
+    # 1フレーム目: タワー（上）へ向かう → y が減る
+    enemy.update_with_towers(fortress, [tower], dt=0.1)
+    assert enemy.get_pos()[1] < 300.0, "タワー方向（-y）へ動くはず"
+
+    # タワーを破壊して World から除去された想定（towers=[]）で再度更新
+    tower.take_damage(tower.get_max_hp())
+    assert tower.is_destroyed()
+    y_before = enemy.get_pos()[1]
+    enemy.update_with_towers(fortress, [], dt=0.1)
+
+    assert enemy.get_pos()[1] > y_before, "破壊後は拠点方向（+y）へ向かうはず"
+    assert brain.last_input is None, "拠点へ直行するためNNは使わないはず"
+
+
+def test_redirect_persists_and_ignores_remaining_towers() -> None:
+    """ターゲット破壊後は、別の生存タワーがあっても狙わず拠点へ向かう。"""
+    brain = _FixedBrain((0.0, 0.0))
+    enemy = EvolvedEnemy(pos=(100.0, 300.0), brain=brain, speed=60.0, generation=0)
+    locked = BaseTower(pos=(100.0, 290.0))  # 最近傍 → ロックオンされる
+    fortress = Fortress(pos=(100.0, 900.0))
+
+    enemy.update_with_towers(fortress, [locked], dt=0.001)  # locked をロックオン
+    locked.take_damage(locked.get_max_hp())  # 破壊
+    other = BaseTower(pos=(100.0, 270.0))  # まだ生きている別タワー（上方向）
+
+    y_before = enemy.get_pos()[1]
+    enemy.update_with_towers(fortress, [other], dt=0.1)  # locked は除去済み・other は生存
+
+    assert enemy.get_pos()[1] > y_before, "別タワーがあっても拠点（下）へ向かうはず"
+    assert brain.last_input is None

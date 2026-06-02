@@ -13,10 +13,13 @@ import pygame as pg
 from .base_enemy import BaseEnemy
 from .bullet import Bullet
 from .constants import (
+    COLOR_HP_BAR_BG,
+    COLOR_HP_BAR_FG,
     COLOR_TOWER,
     TOWER_BASE_COOLDOWN,
     TOWER_BASE_DAMAGE,
     TOWER_BASE_RANGE,
+    TOWER_MAX_HP,
 )
 from .image_cache import load_scaled_image
 
@@ -26,6 +29,9 @@ class BaseTower:
 
     DEFAULT_RADIUS: int = 16
     RANGE_RING_ALPHA: int = 40
+    HP_BAR_WIDTH: int = 44
+    HP_BAR_HEIGHT: int = 5
+    HP_BAR_OFFSET: int = 8
 
     image_name: str = "tower_physical.png"
     image_size: tuple[int, int] = (48, 48)
@@ -38,6 +44,7 @@ class BaseTower:
         cooldown: float | None = None,
         fire_cooldown: float | None = None,
         purchase_cost: int = 0,
+        max_hp: int = TOWER_MAX_HP,
     ) -> None:
         if cooldown is None:
             cooldown = fire_cooldown if fire_cooldown is not None else TOWER_BASE_COOLDOWN
@@ -46,6 +53,9 @@ class BaseTower:
         self._damage: int = damage
         self._cooldown: float = cooldown
         self._last_shot_tick: float = -cooldown  # 起動直後から撃てるように
+        # 耐久（敵の体当たりで減る）。0 で破壊され World から取り除かれる。
+        self._max_hp: int = max(1, int(max_hp))
+        self._hp: int = self._max_hp
         # アップグレードシステム用（担当③）
         self._level: int = 1
         self._total_invested: int = max(0, int(purchase_cost))
@@ -126,6 +136,30 @@ class BaseTower:
         """Cooldown を設定する。"""
         self._cooldown = max(0.0, value)
 
+    # --- 耐久（敵の体当たり） ---
+
+    def get_hp(self) -> int:
+        """現在 HP を返す。"""
+        return self._hp
+
+    def get_max_hp(self) -> int:
+        """最大 HP を返す。"""
+        return self._max_hp
+
+    def set_hp(self, value: int) -> None:
+        """HP を 0〜最大 HP の範囲に丸めて設定する。"""
+        self._hp = max(0, min(self._max_hp, int(value)))
+
+    def take_damage(self, amount: int) -> None:
+        """敵の体当たりなどでダメージを受ける（HP は 0 未満にならない）。"""
+        if amount <= 0:
+            return
+        self._hp = max(0, self._hp - int(amount))
+
+    def is_destroyed(self) -> bool:
+        """HP が 0 以下なら True（World から取り除かれる対象）。"""
+        return self._hp <= 0
+
     # --- upgrade hooks (担当③) ---
 
     def get_level(self) -> int:
@@ -191,6 +225,27 @@ class BaseTower:
         self._draw_range_ring(screen, x, y)
         self.rect.center = (x, y)
         screen.blit(self.image, self.rect)
+        self._draw_hp_bar(screen, x, y)
+
+    def _draw_hp_bar(self, screen: pg.Surface, x: int, y: int) -> None:
+        """被ダメージ時のみ、タワー上部に残り HP バーを描く。"""
+        if self._hp >= self._max_hp:
+            return
+        bar_x = x - self.HP_BAR_WIDTH // 2
+        bar_y = y - self.image_size[1] // 2 - self.HP_BAR_OFFSET
+        pg.draw.rect(
+            screen,
+            COLOR_HP_BAR_BG,
+            (bar_x, bar_y, self.HP_BAR_WIDTH, self.HP_BAR_HEIGHT),
+        )
+        ratio = self._hp / self._max_hp if self._max_hp > 0 else 0.0
+        fg_width = int(self.HP_BAR_WIDTH * ratio)
+        if fg_width > 0:
+            pg.draw.rect(
+                screen,
+                COLOR_HP_BAR_FG,
+                (bar_x, bar_y, fg_width, self.HP_BAR_HEIGHT),
+            )
 
     def _draw_range_ring(self, screen: pg.Surface, x: int, y: int) -> None:
         try:
