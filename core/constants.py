@@ -60,6 +60,10 @@ FITNESS_DISTANCE_FOCUS_DAMAGE_WEIGHT: float = 8.0
 FITNESS_DISTANCE_FOCUS_SURVIVAL_WEIGHT: float = 1.0
 FITNESS_DISTANCE_FOCUS_DISTANCE_WEIGHT: float = 8.0
 EARLY_GENERATION_THRESHOLD: int = 5  # この世代以下はNNを使わずタワー誘導で移動する
+# 早期世代の敵がタワーへ十分接近したとみなす距離。これ以内のタワーは「到達済み」として
+# 誘導対象から除外し、拠点方向へのフォールバック移動に切り替える。
+# タワー半径 (BaseTower.DEFAULT_RADIUS=16) ＋ 敵半径 (BaseEnemy.DEFAULT_RADIUS=10) ＋ 余白。
+EARLY_GENERATION_TOWER_REACH_DISTANCE: float = 40.0
 
 # ===== ネットワーク（担当②） =====
 NET_STATE_HZ: int = 20  # ホスト→クライアントの状態ブロードキャスト周波数
