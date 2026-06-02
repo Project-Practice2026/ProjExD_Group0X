@@ -53,6 +53,10 @@ class HostGame(SoloGame):
         self._state_seq: int = 0
         self._network_started: bool = False
         self._latest_remote_move: tuple[float, float] = (0.0, 0.0)
+        # クライアントのタワー設置（Enter）。押しっぱなしで連続設置しないよう、
+        # 押下の立ち上がり（False→True）でのみ 1 回設置する。
+        self._remote_place: bool = False
+        self._remote_place_prev: bool = False
 
     # ----- accessors -----
 
@@ -125,10 +129,11 @@ class HostGame(SoloGame):
             self._server.get_errors().append(f"received event from client: {msg.get('event')!r}")
 
     def _apply_remote_input(self, msg: dict[str, Any]) -> None:
-        """Player2（前線役）からの最新移動入力だけを保持する。
+        """最初のクライアントからの最新移動入力だけを保持する。
 
-        LAN 協力モードではホストが Builder(Player1) を担当し、最初のクライアントは
-        NetServer 側で Fighter(Player2) として割り当てる。
+        最初のクライアントは NetServer 側で `NET_FIRST_CLIENT_PLAYER_ID`
+        (= PLAYER_FIGHTER_ID) を割り当てられる。この入力で動かす対象は画面左下の
+        建築役（Builder）で、`_apply_latest_remote_input` で反映する。
         """
         try:
             player_id = int(msg.get("player_id", 0))
@@ -141,6 +146,7 @@ class HostGame(SoloGame):
             move = self._parse_move_payload(payload)
             if move is not None:
                 self._latest_remote_move = move
+            self._remote_place = bool(payload.get("place", False))
 
     @staticmethod
     def _parse_move_payload(payload: dict[str, Any]) -> tuple[float, float] | None:
@@ -154,9 +160,17 @@ class HostGame(SoloGame):
             return None
 
     def _apply_latest_remote_input(self, dt: float) -> None:
-        """保持中の最新 input を、そのフレームの dt で 1 回だけ反映する。"""
+        """保持中の最新 input を、そのフレームの dt で 1 回だけ建築役に反映する。
+
+        クライアントは画面左下の建築役（Builder）を操作する。前線役（Fighter）は
+        ホストのキーボードで操作する。
+        """
         dx, dy = self._latest_remote_move
-        self._fighter.update({"dt": dt, "dx": dx, "dy": dy})
+        self._builder.update({"dt": dt, "dx": dx, "dy": dy})
+        # Enter 押下の立ち上がりで、建築役の現在位置にタワーを 1 回設置する。
+        if self._remote_place and not self._remote_place_prev:
+            self._builder.place_tower_at_self(self.get_world())
+        self._remote_place_prev = self._remote_place
 
     def _broadcast_state(self) -> None:
         """現在の World 状態を make_state でシリアライズしてブロードキャストする。"""

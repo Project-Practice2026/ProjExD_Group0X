@@ -183,6 +183,8 @@ class ClientGame(Game):
             "move": [float(dx), float(dy)],
             "attack": bool(keys[pg.K_j]),
             "skill": bool(keys[pg.K_k]),
+            # Enter で建築役の現在位置にタワーを設置（ホスト側で押下の立ち上がりを検出）。
+            "place": bool(keys[pg.K_RETURN] or keys[pg.K_KP_ENTER]),
         }
         self._client.send_input(payload)
 
