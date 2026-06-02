@@ -43,7 +43,11 @@ class MenuScene:
     OPTION_FONT_SIZE: int = 32
     HINT_FONT_SIZE: int = 20
     OPTION_GAP: int = 56
+    # 当たり判定の帯は最長ラベル幅に左右この余白を足した幅にする（文字の外側も押せる）。
+    OPTION_HIT_PADDING_X: int = 40
     COLOR_SELECTED: tuple[int, int, int] = (255, 220, 120)
+    # 選択中の行に敷く薄いハイライト（当たり判定の帯と一致させ、見た目で押せる範囲が分かる）。
+    COLOR_HIGHLIGHT: tuple[int, int, int, int] = (255, 220, 120, 38)
     HINT: str = "[↑↓] 選択   [Enter] 決定   [Esc] 終了"
 
     def __init__(
@@ -115,12 +119,23 @@ class MenuScene:
     # ----- layout / draw -----
 
     def _option_rects(self) -> list[pg.Rect]:
-        """各選択肢の描画矩形（中央揃え）を返す。"""
-        rects: list[pg.Rect] = []
+        """各選択肢のクリック当たり判定（行全体の帯）を返す。
+
+        文字グリフのバウンディングボックスだけだと、文字の左右余白や選択肢どうしの
+        隙間をクリックしても反応せずゲームが起動しないことがある（Issue #146）。
+        そこで横は「最長ラベル幅＋左右余白」、縦は `OPTION_GAP` いっぱいの帯にして、
+        行のどこをクリック／ホバーしても選べるようにする。隣接する帯は隙間なく接する。
+        """
         start_y = SCREEN_HEIGHT // 2 - (len(self._options) - 1) * self.OPTION_GAP // 2
-        for i, (_value, label) in enumerate(self._options):
-            surf = self._option_font.render(label, True, COLOR_TEXT)
-            rect = surf.get_rect(center=(SCREEN_WIDTH // 2, start_y + i * self.OPTION_GAP))
+        max_label_width = max(
+            (self._option_font.size(label)[0] for _value, label in self._options),
+            default=0,
+        )
+        band_width = max_label_width + self.OPTION_HIT_PADDING_X * 2
+        rects: list[pg.Rect] = []
+        for i in range(len(self._options)):
+            rect = pg.Rect(0, 0, band_width, self.OPTION_GAP)
+            rect.center = (SCREEN_WIDTH // 2, start_y + i * self.OPTION_GAP)
             rects.append(rect)
         return rects
 
@@ -132,9 +147,14 @@ class MenuScene:
 
         rects = self._option_rects()
         for i, (_value, label) in enumerate(self._options):
-            color = self.COLOR_SELECTED if i == self._index else COLOR_TEXT
+            selected = i == self._index
+            if selected:
+                highlight = pg.Surface(rects[i].size, pg.SRCALPHA)
+                highlight.fill(self.COLOR_HIGHLIGHT)
+                screen.blit(highlight, rects[i])
+            color = self.COLOR_SELECTED if selected else COLOR_TEXT
             surf = self._option_font.render(label, True, color)
-            screen.blit(surf, rects[i])
+            screen.blit(surf, surf.get_rect(center=rects[i].center))
 
         hint = self._hint_font.render(self.HINT, True, COLOR_TEXT)
         screen.blit(hint, hint.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 48)))
