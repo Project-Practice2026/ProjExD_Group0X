@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import os
+from itertools import pairwise
 
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
@@ -82,6 +83,26 @@ def test_menu_click_outside_options_does_nothing() -> None:
     """選択肢外のクリックでは決定しない。"""
     menu = MenuScene()
     assert menu.handle_event(pg.event.Event(pg.MOUSEBUTTONDOWN, button=1, pos=(0, 0))) is None
+
+
+def test_menu_click_off_glyph_but_in_row_selects_option() -> None:
+    """文字の真上でなく行帯の端をクリックしても決定できる（Issue #146）。"""
+    menu = MenuScene()
+    target = 1  # host
+    rect = menu._option_rects()[target]
+    # 文字グリフ外（行帯の左端付近・上端付近）でも選べることを確認する。
+    edge_pos = (rect.left + 2, rect.top + 2)
+    menu.handle_event(pg.event.Event(pg.MOUSEMOTION, pos=edge_pos))
+    assert menu.get_index() == target  # ホバーも行全体で反応する
+    assert menu.handle_event(pg.event.Event(pg.MOUSEBUTTONDOWN, button=1, pos=edge_pos)) == "host"
+
+
+def test_menu_option_rects_cover_full_row_without_gaps() -> None:
+    """各当たり判定は行（OPTION_GAP）いっぱいで、隣接帯に隙間がない。"""
+    rects = MenuScene()._option_rects()
+    assert all(rect.height == MenuScene.OPTION_GAP for rect in rects)
+    # 隣り合う帯は下端と次の上端が一致し、押しても無反応な隙間が生じない。
+    assert all(lower.top == upper.bottom for upper, lower in pairwise(rects))
 
 
 # ===== is_valid_ipv4 =====
@@ -175,6 +196,8 @@ if __name__ == "__main__":
     test_menu_escape_and_quit_return_quit()
     test_menu_mouse_hover_and_click_selects_option()
     test_menu_click_outside_options_does_nothing()
+    test_menu_click_off_glyph_but_in_row_selects_option()
+    test_menu_option_rects_cover_full_row_without_gaps()
     test_is_valid_ipv4_accepts_normal()
     test_is_valid_ipv4_rejects_invalid()
     test_ip_input_filters_characters()
