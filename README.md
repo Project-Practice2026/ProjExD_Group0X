@@ -36,13 +36,17 @@ git clone https://github.com/TomokiAkiyama06/ProjExD_Group09.git
 # ディレクトリの移動
 cd ProjExD_Group09
 
+# 仮想環境の作成と有効化
 python3 -m venv .venv
-# Linux/macOS
+## Linux/macOS
 source .venv/bin/activate
-# Windows
+## Windows
 .venv\Scripts\activate
 
+# ライブラリのインストール
 pip install -r requirements.txt
+
+# ゲームの起動
 python main.py
 ```
 
