@@ -11,6 +11,7 @@ import numpy as np
 from core.base_enemy import BaseEnemy
 from core.constants import (
     EARLY_GENERATION_THRESHOLD,
+    EARLY_GENERATION_TOWER_REACH_DISTANCE,
     ENEMY_BASE_DAMAGE,
     ENEMY_BASE_HP,
     ENEMY_BASE_REWARD,
@@ -110,7 +111,13 @@ class EvolvedEnemy(BaseEnemy):
             return
 
         if self._generation <= EARLY_GENERATION_THRESHOLD and towers:
-            vx, vy = self._direction_to_nearest_tower(towers)
+            # 既に接近済みのタワーは「到達済み」として誘導対象から除外する。
+            # 全タワーが到達済みなら拠点方向へフォールバックして敵が停滞しないようにする。
+            engageable = self._engageable_towers(towers)
+            if engageable:
+                vx, vy = self._direction_to_nearest_tower(engageable)
+            else:
+                vx, vy = self._direction_to_fortress(fortress)
         else:
             inputs = self._build_input_vector(fortress, towers)
             velocity = np.asarray(self.decide(inputs), dtype=float)
@@ -166,6 +173,30 @@ class EvolvedEnemy(BaseEnemy):
         if self._max_hp <= 0:
             return 0.0
         return self._clip(self._hp / self._max_hp, minimum=0.0, maximum=1.0)
+
+    def _engageable_towers(
+        self,
+        towers: Sequence[BaseTower],
+    ) -> list[BaseTower]:
+        """`EARLY_GENERATION_TOWER_REACH_DISTANCE` より遠いタワーだけを返す。
+
+        既に十分接近しているタワーは「到達済み」として誘導対象から除外する。
+        これにより敵がタワー位置で振動して停滞する不具合を防ぐ。
+        """
+        return [
+            t
+            for t in towers
+            if self._distance_to(t.get_pos()) > EARLY_GENERATION_TOWER_REACH_DISTANCE
+        ]
+
+    def _direction_to_fortress(self, fortress: Fortress) -> tuple[float, float]:
+        """拠点方向への正規化方向ベクトルを返す。同座標なら (0.0, 0.0)。"""
+        fx, fy = fortress.get_pos()
+        x, y = self._pos
+        dist = math.hypot(fx - x, fy - y)
+        if dist == 0.0:
+            return (0.0, 0.0)
+        return ((fx - x) / dist, (fy - y) / dist)
 
     def _direction_to_nearest_tower(
         self,
